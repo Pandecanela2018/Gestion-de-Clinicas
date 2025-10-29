@@ -23,5 +23,5 @@ Front End, Backend y base de datos
 
 5- Descargar la siguiente dependencia: **pip install "fastapi[standard]"** en la carpeta **\FastAPIex\API**
 
-## **Pasos para iniciarl el archivo**
+## **Pasos para iniciarlo el archivo**
 1- Colocar en la terminal **fastapi dev main.py**
