@@ -25,3 +25,10 @@ Front End, Backend y base de datos
 
 ## **Pasos para iniciarlo el archivo**
 1- Colocar en la terminal **fastapi dev main.py**
+
+
+**Instalacion de dependencias**
+1- pip install -r requirements.txt
+
+## ojo
+Instalar el venv globalmente.
