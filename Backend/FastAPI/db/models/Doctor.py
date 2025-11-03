@@ -1,10 +1,10 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class Doctor(BaseModel):
-    id: str | None
+    id: Optional[str] = None
     name: str
     surname: str
-    Horario_ID_Ref: None
     speciality: str
     email: str
-    cellphone: int 
+    cellphone: int
