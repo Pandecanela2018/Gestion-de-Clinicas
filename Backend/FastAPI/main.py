@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from Backend.FastAPI.routers.doctor import doctor
+from routers import doctor
 
 app = FastAPI()
 
