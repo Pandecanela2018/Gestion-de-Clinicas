@@ -7,4 +7,13 @@ class Doctor(BaseModel):
     surname: str
     speciality: str
     email: str
-    cellphone: int
+    phone: int
+
+class DoctorP(BaseModel):
+    id: Optional[str] = None
+    name: str
+    surname: str
+    speciality: str
+    email: str
+    phone: int
+    password: Optional[str] = None
