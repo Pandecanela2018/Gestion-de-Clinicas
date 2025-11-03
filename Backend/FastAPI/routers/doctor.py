@@ -64,4 +64,4 @@ def search_doctor(field: str, key):
         doctor = db_client.Prueba.Doctor.find_one({field: key})
         return Doctor(**doctor_schema(doctor))
     except:
-        return{"error": "No se a encontrado el usuario"}
+        return{"error": "No se ha encontrado el usuario"}
