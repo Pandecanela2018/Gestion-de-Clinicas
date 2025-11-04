@@ -1,0 +1,74 @@
+from fastapi import APIRouter, HTTPException, status
+from db.models.diagnostic import Diagnostic
+from db.schemas.diagnostic import diagnostics_schema,diagnostic_schema
+from db.client import db_client
+from bson import ObjectId
+
+router = APIRouter()
+
+router = APIRouter(prefix="/diagnostic",
+                   tags=["diagnostic"],
+                   responses={status.HTTP_404_NOT_FOUND: {"message": "No encontrado"}})
+
+@router.get("/", response_model=list[Diagnostic])
+async def diagnostics():
+    return diagnostics_schema(db_client.Prueba.Diagnostic.find())
+
+@router.get("/{id}")
+async def diagnostic(id: str):
+    return search_diagnostic("_id", ObjectId(id))
+
+@router.get("/")
+async def diagnostic(id: str):
+    return search_diagnostic("_id", ObjectId(id))
+
+@router.post("/", response_model=Diagnostic, status_code=status.HTTP_201_CREATED)
+async def diagnostic(diagnostic: Diagnostic):
+    existing_diagnostic = db_client.Prueba.Diagnostic.find_one({
+        "_id": diagnostic.id,
+    })
+    
+    if existing_diagnostic:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ya existe el expediente"
+        )
+
+    diagnostic_dict = dict(diagnostic)
+    del diagnostic_dict["id"]
+
+    id = db_client.Prueba.Diagnostic.insert_one(diagnostic_dict).inserted_id
+
+    new_diagnostic = diagnostic_schema(db_client.Prueba.Diagnostic.find_one({"_id": id}))
+
+    return Diagnostic(**new_diagnostic)
+
+@router.put("/", response_model=Diagnostic)
+async def diagnostic(diagnostic: Diagnostic):
+
+    diagnostic_dict = dict(diagnostic)
+    del diagnostic_dict["id"]
+
+    try:
+        db_client.Prueba.Diagnostic.find_one_and_replace({"_id": ObjectId(diagnostic.id)}, diagnostic_dict)
+    except:
+        return {"error": "No se ha actualizado el diagostico"}
+    
+    return search_diagnostic("_id", ObjectId(diagnostic.id))
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def diagnostic(id: str):
+    found = db_client.Prueba.Diagnostic.find_one_and_delete({"_id": ObjectId(id)})
+
+    if not found:
+        return {"error": "No se ha eliminado la cita"}
+
+def search_diagnostic(field: str, key):
+    try:
+        appointment = db_client.Prueba.Diagnostic.find_one({field: key})
+        return Diagnostic(**diagnostic_schema(appointment))
+    except:
+        return{"error": "No se ha encontrado la cita"}
+    
+# prueba1
