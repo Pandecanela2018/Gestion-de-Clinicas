@@ -8,4 +8,4 @@ def appointment_schema(appointment) -> dict:
 def appointments_schema(appointments) -> list:
     return [appointment_schema(appointment) for appointment in appointments]
 
-#prueba
+#prueba1

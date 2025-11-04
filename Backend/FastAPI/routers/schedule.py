@@ -72,4 +72,4 @@ def search_schedule(field: str, key):
     except:
         return{"error": "No se ha encontrado el horario"}
     
-#prueba
+#prueba1
