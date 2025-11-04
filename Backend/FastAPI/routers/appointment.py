@@ -71,3 +71,5 @@ def search_appointment(field: str, key):
         return Appointment(**appointment_schema(appointment))
     except:
         return{"error": "No se ha encontrado la cita"}
+    
+# prueba

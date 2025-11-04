@@ -71,3 +71,5 @@ def search_schedule(field: str, key):
         return Schedule(**schedule_schema(schedule))
     except:
         return{"error": "No se ha encontrado el horario"}
+    
+#prueba

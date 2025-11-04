@@ -8,3 +8,5 @@ class Schedule(BaseModel):
     day: str
     hour_start: str
     hour_end: str
+
+#prueba

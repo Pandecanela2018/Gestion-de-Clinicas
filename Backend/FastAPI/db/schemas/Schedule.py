@@ -7,3 +7,5 @@ def schedule_schema(schedule) -> dict:
 
 def schedules_schema(schedules) -> list:
     return [schedule_schema(schedule) for schedule in schedules]
+
+#prueba

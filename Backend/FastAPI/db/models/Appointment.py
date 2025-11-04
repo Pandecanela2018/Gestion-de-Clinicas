@@ -8,3 +8,5 @@ class Appointment(BaseModel):
     doctor_name: str
     date: datetime
     status: str
+
+#prueba
