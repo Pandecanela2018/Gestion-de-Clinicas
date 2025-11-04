@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
-from db.models.patient import Patient
+from db.models.patient import Patient,PatientP
 from db.schemas.patient import patient_schema, patients_schema
+from utils.security import hash_password, verify_password
 from db.client import db_client
 from bson import ObjectId
+
 
 router = APIRouter()
 
@@ -24,13 +26,14 @@ async def doctor(id: str):
     return search_patient("_id", ObjectId(id))
 
 @router.post("/", response_model=Patient, status_code=status.HTTP_201_CREATED)
-async def patient(patient: Patient):
+async def patient(patient: PatientP):
     if type(search_patient("email", patient.email)) == Patient:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="El usuario ya existe"
         )
-    
+
     patient_dict = dict(patient)
+    patient_dict["password"] = hash_password(patient_dict["password"])
     del patient_dict["id"]
 
     id = db_client.Prueba.Patient.insert_one(patient_dict).inserted_id
@@ -65,3 +68,4 @@ def search_patient(field: str, key):
         return Patient(**patient_schema(patient))
     except:
         return{"error": "No se ha encontrado el usuario"}
+    

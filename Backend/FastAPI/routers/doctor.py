@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from db.models.Doctor import Doctor
-from db.schemas.Doctor import doctor_schema, doctors_schema
+from db.models.doctor import Doctor, DoctorP
+from db.schemas.doctor import doctor_schema, doctors_schema
+from utils.security import hash_password, verify_password
 from db.client import db_client
 from bson import ObjectId
 
@@ -14,22 +15,23 @@ router = APIRouter(prefix="/doctor",
 async def doctors():
     return doctors_schema(db_client.Prueba.Doctor.find())
 
-@router.get("/{id}")
+@router.get("/{id}") #Path
 async def doctor(id: str):
     return search_doctor("_id", ObjectId(id))
 
-@router.get("/")
+@router.get("/") #Query
 async def doctor(id: str):
     return search_doctor("_id", ObjectId(id))
 
 @router.post("/", response_model=Doctor, status_code=status.HTTP_201_CREATED)
-async def doctor(doctor: Doctor):
+async def doctor(doctor: DoctorP):
     if type(search_doctor("email", doctor.email)) == Doctor:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="El usuario ya existe"
         )
 
     doctor_dict = dict(doctor)
+    doctor_dict["password"] = hash_password(doctor_dict["password"])
     del doctor_dict["id"]
 
     id = db_client.Prueba.Doctor.insert_one(doctor_dict).inserted_id
@@ -39,10 +41,15 @@ async def doctor(doctor: Doctor):
     return Doctor(**new_doctor)
 
 @router.put("/", response_model=Doctor)
-async def doctor(doctor: Doctor):
+async def doctor(doctor: DoctorP):
 
     doctor_dict = dict(doctor)
     del doctor_dict["id"]
+
+    if doctor.password:
+        doctor_dict["password"] = hash_password(doctor.password)
+    else:
+        del doctor_dict["password"]
 
     try:
         db_client.Prueba.Doctor.find_one_and_replace({"_id": ObjectId(doctor.id)}, doctor_dict)

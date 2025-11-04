@@ -4,7 +4,7 @@ def doctor_schema(doctor) -> dict:
             "surname": doctor["surname"],
             "speciality": doctor["speciality"],
             "email": doctor["email"],
-            "cellphone": doctor["cellphone"]}
+            "phone": doctor["phone"]}
 
 def doctors_schema(doctors) -> list:
     return [doctor_schema(doctor) for doctor in doctors]
