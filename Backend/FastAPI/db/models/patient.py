@@ -10,6 +10,7 @@ class Patient(BaseModel):
     email: str
     phone: int
     birth_date: datetime
+
     file_number: int
 
 class PatientP(BaseModel):
@@ -22,3 +23,4 @@ class PatientP(BaseModel):
     birth_date: datetime
     file_number: int
     password: Optional[str] = None
+
