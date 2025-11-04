@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
-from db.models.doctor import Doctor
-from db.schemas.doctor import doctor_schema, doctors_schema
+from db.models.Doctor import Doctor
+from db.schemas.Doctor import doctor_schema, doctors_schema
 from db.client import db_client
 from bson import ObjectId
 
