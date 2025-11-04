@@ -29,7 +29,7 @@ async def patient(patient: Patient):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="El usuario ya existe"
         )
-
+    
     patient_dict = dict(patient)
     del patient_dict["id"]
 
