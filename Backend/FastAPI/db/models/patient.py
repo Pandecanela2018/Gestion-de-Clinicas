@@ -10,7 +10,6 @@ class Patient(BaseModel):
     email: str
     phone: int
     birth_date: datetime
-
     file_number: int
 
 class PatientP(BaseModel):
