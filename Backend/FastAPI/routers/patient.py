@@ -48,6 +48,11 @@ async def patient(patient: Patient):
     patient_dict = dict(patient)
     del patient_dict["id"]
 
+    if patient.password:
+        patient_dict["password"] = hash_password(patient.password)
+    else:
+        del patient_dict["password"]
+
     try:
         db_client.Prueba.Patient.find_one_and_replace({"_id": ObjectId(patient.id)}, patient_dict)
     except:
@@ -60,7 +65,7 @@ async def patient(id: str):
     found = db_client.Prueba.Patient.find_one_and_delete({"_id": ObjectId(id)})
 
     if not found:
-        return {"error": "No se a eliminado el usuario"}
+        return {"error": "No se ha eliminado el usuario"}
 
 def search_patient(field: str, key):
     try:
