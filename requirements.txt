@@ -2,3 +2,4 @@ fastapi[standard]==0.120.4
 passlib[bcrypt]==1.7.4
 pymongo==4.15.3
 httpx==0.25.2 # Añadido para llamadas a la API desde Reflex
+Jinja2==3.1.6
