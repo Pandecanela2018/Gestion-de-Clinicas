@@ -43,7 +43,7 @@ async def patient(patient: PatientP):
     return Patient(**new_patient)
 
 @router.put("/", response_model=Patient)
-async def patient(patient: Patient):
+async def patient(patient: PatientP):
 
     patient_dict = dict(patient)
     del patient_dict["id"]

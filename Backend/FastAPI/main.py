@@ -1,0 +1,29 @@
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from routers import doctor, patient, file, schedule, appointment, diagnostic, admin, auth 
+from fastapi.templating import Jinja2Templates
+
+app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
+
+# Define la ruta al directorio 'static'
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
+
+app.include_router(doctor.router)
+
+app.include_router(auth.router)
+
+app.include_router(patient.router)
+
+app.include_router(file.router)
+
+app.include_router(schedule.router)
+
+app.include_router(appointment.router)
+
+app.include_router(diagnostic.router)
+
+app.include_router(admin.router)
