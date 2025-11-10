@@ -3,7 +3,8 @@ def schedule_schema(schedule) -> dict:
             "doctor_name": schedule["doctor_name"],
             "day": schedule["day"],
             "hour_start": schedule["hour_start"],
-            "hour_end": schedule["hour_end"]}
+            "hour_end": schedule["hour_end"],
+            "status": schedule.get("status", "scheduled")}
 
 def schedules_schema(schedules) -> list:
     return [schedule_schema(schedule) for schedule in schedules]

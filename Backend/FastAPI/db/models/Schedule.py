@@ -8,5 +8,6 @@ class Schedule(BaseModel):
     day: str
     hour_start: str
     hour_end: str
+    status: Optional[str] = "scheduled"
 
 #prueba1
