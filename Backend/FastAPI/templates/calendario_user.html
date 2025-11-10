@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendario de Citas - Gestión de Clínicas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f7fb; font-family: Arial, sans-serif; }
+        .sidebar { background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); min-height: 100vh; width: 220px; position: fixed; left: 0; top: 0; padding-top: 20px; }
+        .logo { text-align: center; margin-bottom: 40px; }
+        .logo img { width: 80px; height: 80px; }
+        .sidebar .nav-item { margin: 15px 0; border-left: 4px solid transparent; transition: all 0.3s ease; }
+        .sidebar .nav-item.active { border-left-color: #3498db; background-color: rgba(52, 152, 219, 0.1); }
+        .sidebar .nav-link { color: #ecf0f1; padding: 12px 20px; text-decoration: none; display: flex; align-items: center; gap: 15px; transition: all 0.3s ease; }
+        .sidebar .nav-link:hover { color: #3498db; }
+        .sidebar .nav-link i { width: 25px; text-align: center; font-size: 20px; }
+        .main-content { margin-left: 220px; padding: 30px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { margin: 0; font-size: 28px; }
+        .search-bar { background: white; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 10px; width: 300px; }
+        .search-bar input { border: none; outline: none; width: 100%; }
+        .calendar-container { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px; }
+        .calendar-header { text-align: center; margin-bottom: 30px; }
+        .calendar-header h3 { color: #2c3e50; margin-bottom: 5px; font-size: 24px; }
+        .calendar-header p { color: #666; margin: 0; font-size: 14px; }
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: #f9f9f9; padding: 15px; border-radius: 8px; text-align: center; border-top: 3px solid #667eea; }
+        .stat-box i { font-size: 24px; margin-bottom: 10px; }
+        .stat-box .number { font-size: 20px; font-weight: bold; color: #2c3e50; margin: 10px 0; }
+        .stat-box .label { color: #666; font-size: 12px; }
+        .stat-box.today i { color: #667eea; }
+        .stat-box.completed i { color: #27ae60; }
+        .stat-box.pending i { color: #e74c3c; }
+        .stat-box.confirmed i { color: #3498db; }
+        .stat-box.cancelled i { color: #95a5a6; }
+        .filters-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 15px; }
+        .filters-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { background: #f0f0f0; border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; color: #666; font-size: 14px; }
+        .filter-btn:hover, .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-nav button { background: white; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .calendar-table { width: 100%; border-collapse: collapse; }
+        .calendar-table th, .calendar-table td { padding: 20px 12px; border: 1px solid #eee; text-align: center; vertical-align: top; min-height: 80px; }
+        .calendar-table .other-month { color: #bbb; background: #fafafa; }
+        .calendar-table .today { background: #e9f2ff; }
+        .appointment-dots { display:flex; gap:6px; justify-content:center; margin-top:8px; }
+        .appointment-dot { width:8px; height:8px; border-radius:50%; }
+        .appointment-dot.scheduled { background:#f39c12; }
+        .appointment-dot.confirmed { background:#3498db; }
+        .appointment-dot.completed { background:#27ae60; }
+        .appointment-dot.cancelled { background:#95a5a6; }
+        .appointments-section { margin-top:20px; }
+        .appointment-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; }
+        .appointment-status { padding:6px 10px; border-radius:12px; font-size:13px; }
+        .appointment-status.scheduled { background:#fff4e6; color:#c47b00; }
+        .appointment-status.confirmed { background:#e8f7ec; color:#1c8a3a; }
+        .appointment-status.cancelled { background:#f3f4f6; color:#6b7280; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo" />
+        </div>
+        <nav>
+            <div class="nav-item"><a href="/dashboard" class="nav-link"><i class="fas fa-home"></i><span>Inicio</span></a></div>
+            <div class="nav-item active"><a href="/calendario" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Calendario</span></a></div>
+            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-plus-circle"></i><span>Agendar Cita</span></a></div>
+            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-prescription-bottle"></i><span>Receta</span></a></div>
+            <div class="nav-item"><a href="#" class="nav-link"><i class="fas fa-file-medical"></i><span>Historial Médico</span></a></div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Calendario de Citas Médicas</h2>
+            <div class="search-bar"><i class="fas fa-search"></i><input id="searchInput" placeholder="Buscar..." /></div>
+        </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header"><h3>Calendario de Citas Médicas</h3><p>Gestiona y visualiza todas tus citas médicas programadas</p></div>
+            <div class="stats-row">
+                <div class="stat-box today"><i class="fas fa-calendar-day"></i><div class="number" id="citasHoy">0</div><div class="label">Citas Hoy</div></div>
+                <div class="stat-box completed"><i class="fas fa-check-circle"></i><div class="number" id="completadas">0</div><div class="label">Completadas</div></div>
+                <div class="stat-box pending"><i class="fas fa-clock"></i><div class="number" id="pendientes">0</div><div class="label">Pendientes</div></div>
+                <div class="stat-box confirmed"><i class="fas fa-user-check"></i><div class="number" id="confirmadas">0</div><div class="label">Confirmadas</div></div>
+                <div class="stat-box cancelled"><i class="fas fa-times-circle"></i><div class="number" id="canceladas">0</div><div class="label">Canceladas</div></div>
+            </div>
+            <div class="filters-section"><div class="filters-group"><i class="fas fa-filter"></i><button class="filter-btn active" onclick="filterAppointments('all')">Todos</button><button class="filter-btn" onclick="filterAppointments('mes')">Mes</button><button class="filter-btn" onclick="filterAppointments('semana')">Semana</button><button class="filter-btn" onclick="filterAppointments('agenda')">Agenda</button></div></div>
+            <div class="calendar-nav"><button onclick="previousMonth()"><i class="fas fa-chevron-left"></i></button><div class="current-date"><i class="fas fa-calendar-days"></i> <span id="currentMonth"></span></div><button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button></div>
+            <table class="calendar-table"><thead><tr><th>Dom</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sab</th></tr></thead><tbody id="calendarBody"><!-- dinámico --></tbody></table>
+            <div class="appointments-section"><h4><i class="fas fa-list"></i> Citas Programadas para Hoy</h4><div id="appointmentsList"><div class="no-appointments"><i class="fas fa-inbox"></i><p>No hay citas para esta fecha</p></div></div></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentDate = new Date();
+        let allSchedules = [];
+        let filteredSchedules = [];
+        let selectedDate = new Date();
+
+        async function loadSchedules() {
+            try {
+                const response = await fetch('/appointments/');
+                if (response.ok) {
+                    const data = await response.json();
+                    allSchedules = data;
+                    filteredSchedules = data;
+                    renderCalendar();
+                    updateStats();
+                    // Mantener la fecha seleccionada en lugar de cambiarla
+                    if (selectedDate) {
+                        displayAppointments(selectedDate);
+                    } else {
+                        displayAppointments(new Date());
+                    }
+                } else {
+                    console.error('Error al cargar las citas');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} de ${year}`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+            let dayCounter = 1;
+            let nextMonthDays = 1;
+            for (let week = 0; week < 6; week++) {
+                const row = document.createElement('tr');
+                for (let day = 0; day < 7; day++) {
+                    const cell = document.createElement('td');
+                    if (week === 0 && day < firstDay) {
+                        cell.textContent = daysInPrevMonth - firstDay + day + 1;
+                        cell.classList.add('other-month');
+                    } else if (dayCounter > daysInMonth) {
+                        cell.textContent = nextMonthDays++;
+                        cell.classList.add('other-month');
+                    } else {
+                        const dateObj = new Date(year, month, dayCounter);
+                        const today = new Date();
+                        if (dateObj.toDateString() === today.toDateString()) cell.classList.add('today');
+                        const dateStr = `<span class=\"date-number\">${dayCounter}</span>`;
+                        const appointmentsForDay = getAppointmentsForDate(dateObj);
+                        const dotsHtml = appointmentsForDay.length > 0 ? `<div class=\"appointment-dots\">${appointmentsForDay.map(a => `<div class=\"appointment-dot ${getStatusClass(a.status)}\"></div>`).join('')}</div>` : '';
+                        cell.innerHTML = dateStr + dotsHtml;
+                        cell.onclick = () => selectDate(dateObj);
+                        dayCounter++;
+                    }
+                    row.appendChild(cell);
+                }
+                calendarBody.appendChild(row);
+            }
+        }
+
+        function getAppointmentsForDate(date) { const dateStr = date.toISOString().split('T')[0]; return filteredSchedules.filter(schedule => schedule.day === dateStr); }
+        function normalizeStatus(status) {
+            if (!status) return 'scheduled';
+            const normalized = status.toLowerCase().trim();
+            if (normalized.includes('completad')) return 'completed';
+            if (normalized.includes('confirm')) return 'confirmed';
+            if (normalized.includes('cancel')) return 'cancelled';
+            return 'scheduled';
+        }
+        function getStatusClass(status) { 
+            const normalized = normalizeStatus(status);
+            return normalized;
+        }
+        function selectDate(date) { selectedDate = date; displayAppointments(date); }
+        function displayAppointments(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            const appointmentsForDate = filteredSchedules.filter(schedule => schedule.day === dateStr);
+            const appointmentsList = document.getElementById('appointmentsList');
+            if (appointmentsForDate.length === 0) {
+                appointmentsList.innerHTML = `<div class="no-appointments"><i class="fas fa-inbox"></i><p>No hay citas para esta fecha</p></div>`;
+            } else {
+                appointmentsList.innerHTML = appointmentsForDate.map(appointment => `
+                    <div class="appointment-item">
+                        <div class="appointment-info">
+                            <div class="appointment-time"><i class="fas fa-clock"></i> ${appointment.hour_start || '---'} - ${appointment.hour_end || '---'}</div>
+                            <div class="appointment-doctor">Dr. ${appointment.doctor_name}</div>
+                            <div class="appointment-day">${new Date(appointment.day).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                        <span class="appointment-status ${getStatusClass(appointment.status)}">${normalizeStatus(appointment.status) === 'completed' ? 'Completada' : normalizeStatus(appointment.status) === 'confirmed' ? 'Confirmada' : normalizeStatus(appointment.status) === 'cancelled' ? 'Cancelada' : 'Programada'}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const citasHoy = filteredSchedules.filter(s => s.day === today).length;
+            const completadas = filteredSchedules.filter(s => normalizeStatus(s.status) === 'completed').length;
+            const pendientes = filteredSchedules.filter(s => normalizeStatus(s.status) === 'scheduled').length;
+            const confirmadas = filteredSchedules.filter(s => normalizeStatus(s.status) === 'confirmed').length;
+            const canceladas = filteredSchedules.filter(s => normalizeStatus(s.status) === 'cancelled').length;
+            document.getElementById('citasHoy').textContent = citasHoy;
+            document.getElementById('completadas').textContent = completadas;
+            document.getElementById('pendientes').textContent = pendientes;
+            document.getElementById('confirmadas').textContent = confirmadas;
+            document.getElementById('canceladas').textContent = canceladas;
+        }
+
+        function filterAppointments(type) {
+            const buttons = document.querySelectorAll('.filter-btn'); buttons.forEach(btn => btn.classList.remove('active')); try { event.target.classList.add('active'); } catch(e){}
+            const today = new Date(); const year = today.getFullYear(); const month = today.getMonth();
+            switch(type) {
+                case 'mes': filteredSchedules = allSchedules.filter(schedule => { const sd = new Date(schedule.day); return sd.getMonth() === month && sd.getFullYear() === year; }); break;
+                case 'semana': { const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay()); const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6); filteredSchedules = allSchedules.filter(schedule => { const sd = new Date(schedule.day); return sd >= startOfWeek && sd <= endOfWeek; }); } break;
+                case 'agenda': filteredSchedules = allSchedules.filter(schedule => new Date(schedule.day) >= today); break;
+                default: filteredSchedules = allSchedules;
+            }
+            renderCalendar(); updateStats();
+            // Mantener la fecha seleccionada sin cambiarla
+            if (selectedDate) {
+                displayAppointments(selectedDate);
+            }
+        }
+
+        function previousMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); if (selectedDate) { displayAppointments(selectedDate); } }
+        function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); if (selectedDate) { displayAppointments(selectedDate); } }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase(); filteredSchedules = allSchedules.filter(schedule => (schedule.doctor_name || '').toLowerCase().includes(searchTerm) || (schedule.day || '').includes(searchTerm)); renderCalendar(); displayAppointments(selectedDate); });
+        
+        // Cargar citas inicialmente
+        loadSchedules();
+        
+        // Recargar citas cada 3 segundos para actualizar en tiempo real
+        setInterval(loadSchedules, 3000);
+    </script>
+</body>
+</html>
+                
