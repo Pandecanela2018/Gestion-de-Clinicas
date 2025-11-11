@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Historial Médico - Gestión de Clínicas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body{ font-family:Arial,Helvetica,sans-serif; background:#f5f7fb }
+        .sidebar{ background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%); min-height:100vh; width:220px; position:fixed; left:0; top:0; padding-top:20px }
+        .logo{text-align:center;margin-bottom:40px}
+        .logo img{width:80px;height:80px}
+        .sidebar .nav-item{margin:15px 0;border-left:4px solid transparent}
+        .sidebar .nav-item.active, .sidebar .nav-item:hover{border-left-color:#3498db;background-color:rgba(52,152,219,0.08)}
+        .sidebar .nav-link{color:#ecf0f1;padding:12px 20px;display:flex;align-items:center;gap:15px;text-decoration:none}
+        .main-content{margin-left:220px;padding:30px}
+        .header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:20px;border-radius:8px;margin-bottom:20px}
+        .card-white{background:#fff;border-radius:8px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);border:1px solid #eee}
+        .section-buttons .btn{min-width:140px}
+        .list-item{padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+        .small-muted{font-size:13px;color:#666}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo"></div>
+        <nav>
+            <div class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-home"></i><span>Inicio</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="/calendario"><i class="fas fa-calendar-alt"></i><span>Calendario</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="/agendar"><i class="fas fa-plus-circle"></i><span>Agendar Cita</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="/receta"><i class="fas fa-prescription-bottle"></i><span>Receta</span></a></div>
+            <div class="nav-item active"><a class="nav-link" href="/historial"><i class="fas fa-file-medical"></i><span>Historial Médico</span></a></div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h3>Historial Médico</h3>
+                <div>Paciente: {{ patient.name }} {{ patient.surname }}</div>
+                <div style="font-size:13px;color:#e9eef8;margin-top:6px">Portafolio médico: <strong style="color:#fff">{{ patient.file_number }}</strong></div>
+            </div>
+            <div>
+                <div class="small-muted">Última actualización: ahora</div>
+            </div>
+        </div>
+
+        <div class="card-white mb-3">
+            <div class="d-flex gap-3 flex-wrap section-buttons">
+                <button class="btn btn-light" data-section="resumen" onclick="showSection('resumen')"><i class="fas fa-list"></i> Resumen</button>
+                <button class="btn btn-light" data-section="citas" onclick="showSection('citas')"><i class="fas fa-calendar-days"></i> Citas ({{ appointments|length }})</button>
+                <button id="btn-diagnosticos" class="btn btn-light" data-section="diagnosticos" onclick="showSection('diagnosticos')"><i class="fas fa-notes-medical"></i> Diagnósticos (<span id="diag-count">{{ diagnostics|length }}</span>)</button>
+                <button class="btn btn-light" data-section="medicamentos" onclick="showSection('medicamentos')"><i class="fas fa-pills"></i> Medicamentos ({{ medications|length }})</button>
+                <button class="btn btn-light" data-section="alergias" onclick="showSection('alergias')"><i class="fas fa-exclamation-triangle"></i> Alergias ({{ allergies|length }})</button>
+                <button class="btn btn-light" data-section="vacunas" onclick="showSection('vacunas')"><i class="fas fa-syringe"></i> Vacunas ({{ vaccines|length }})</button>
+            </div>
+        </div>
+
+        <div id="content-area">
+            <div id="resumen" class="card-white mb-3 section" style="display:none">
+                <h5>Resumen Médico</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card-white p-3 mb-2">Diagnósticos: <strong>{{ diagnostics|length }}</strong></div>
+                        <div class="card-white p-3 mb-2">Citas registradas: <strong>{{ appointments|length }}</strong></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-white p-3 mb-2">Medicamentos: <strong>{{ medications|length }}</strong></div>
+                        <div class="card-white p-3 mb-2">Alergias: <strong>{{ allergies|length }}</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="citas" class="card-white mb-3 section" style="display:none">
+                <h5>Citas</h5>
+                <div id="citasList">
+                    {% if appointments and appointments|length > 0 %}
+                        {% for a in appointments %}
+                        <div class="list-item" data-id="{{ a.id }}">
+                            <div>
+                                <div style="font-weight:bold">{{ a.date }} - {{ a.doctor_name }}</div>
+                                <div class="small-muted">{{ a.reason if a.reason else '' }}</div>
+                            </div>
+                            <div>
+                                <a class="btn btn-sm btn-primary" href="/calendario">Ver</a>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAppointment('{{ a.id }}', this)">Eliminar</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="small-muted p-3">No hay citas registradas.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div id="diagnosticos" class="card-white mb-3 section" style="display:none">
+                <h5>Diagnósticos / Recetas</h5>
+                        <div class="d-flex mb-2">
+                            <input id="searchMr" class="form-control" placeholder="Buscar por Portafolio médico (ej. 221)" style="width:260px;margin-right:8px" />
+                            <button class="btn btn-outline-primary" onclick="searchDiagnostics()">Buscar</button>
+                            <button class="btn btn-outline-secondary ms-2" onclick="loadInitialDiagnostics()">Mostrar recientes</button>
+                        </div>
+                        <div id="diagList">
+                            {% if diagnostics and diagnostics|length > 0 %}
+                                {% for d in diagnostics %}
+                                <div class="list-item" data-id="{{ d.id }}">
+                                    <div>
+                                        <div style="font-weight:bold">{{ d.date }} - Expediente: {{ d.medical_record }}</div>
+                                        <div class="small-muted">{{ d.description }}</div>
+                                        <div style="margin-top:6px;color:#333">Medicamentos: <span style="color:#666">{{ d.treatment }}</span></div>
+                                    </div>
+                                    <div>
+                                        <a class="btn btn-sm btn-secondary" href="/receta">Ver</a>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteDiagnostic('{{ d.id }}', this)">Eliminar</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="small-muted p-3">No hay diagnósticos registrados para este portafolio. Usa la búsqueda para localizar por Portafolio médico o pulsa "Mostrar recientes".</div>
+                            {% endif %}
+                        </div>
+                    </div>
+            </div>
+
+            <div id="medicamentos" class="card-white mb-3 section" style="display:none">
+                <h5>Medicamentos</h5>
+                <div class="small-muted p-3">Lista de medicamentos no disponible (no modelado). Puedes agregar registros en el futuro.</div>
+            </div>
+
+            <div id="alergias" class="card-white mb-3 section" style="display:none">
+                <h5>Alergias</h5>
+                <div class="small-muted p-3">No hay alergias registradas.</div>
+            </div>
+
+            <div id="vacunas" class="card-white mb-3 section" style="display:none">
+                <h5>Vacunas</h5>
+                <div class="small-muted p-3">No hay vacunas registradas.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id){
+            document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+            const el = document.getElementById(id);
+            if(el) el.style.display='block';
+            // highlight button
+            document.querySelectorAll('.section-buttons .btn').forEach(b=>b.classList.remove('btn-primary'));
+            const btn = document.querySelector(`.section-buttons .btn[data-section='${id}']`);
+            if(btn) btn.classList.add('btn-primary');
+            // if user opens diagnostics and there are none server-side, load recent ones
+            if(id === 'diagnosticos'){
+                const diagList = document.getElementById('diagList');
+                if(diagList && diagList.children.length === 0){
+                    loadInitialDiagnostics();
+                }
+            }
+        }
+
+        // default
+        showSection('resumen');
+                // If there are no diagnostics passed from server, load recent ones automatically
+                const __diagCountEl = document.getElementById('diag-count');
+                const __initialDiagCount = __diagCountEl ? parseInt(__diagCountEl.innerText || '0', 10) : 0;
+                if(__initialDiagCount === 0){
+                    // load recent diagnostics immediately so the user sees existing DB entries
+                    loadInitialDiagnostics();
+                }
+
+        async function deleteAppointment(id, btn){
+            if(!confirm('Eliminar cita?')) return;
+            try{
+                const res = await fetch(`/appointment/${id}`, { method: 'DELETE' });
+                if(res.ok){
+                    const item = btn.closest('.list-item'); if(item) item.remove();
+                } else alert('Error al eliminar');
+            }catch(e){alert('Error');}
+        }
+
+        async function deleteDiagnostic(id, btn){
+            if(!confirm('Eliminar diagnóstico?')) return;
+            try{
+                const res = await fetch(`/diagnostic/${id}`, { method: 'DELETE' });
+                if(res.ok || res.status === 204){
+                    const item = btn.closest('.list-item'); if(item) item.remove();
+                    // update diagnostics count
+                    const cntEl = document.getElementById('diag-count');
+                    if(cntEl){
+                        const newCount = document.querySelectorAll('#diagList .list-item').length;
+                        cntEl.innerText = newCount;
+                    }
+                } else alert('Error al eliminar');
+            }catch(e){alert('Error');}
+        }
+
+        async function renderDiagnosticsFromList(list){
+            const container = document.getElementById('diagList');
+            if(!container) return;
+            if(!list || list.length === 0){
+                container.innerHTML = '<div class="small-muted p-3">No se encontraron diagnósticos.</div>';
+                return;
+            }
+            let html = '';
+            for(const d of list){
+                const date = d.date || '';
+                html += `<div class="list-item" data-id="${d.id}">`+
+                    `<div><div style="font-weight:bold">${date} - Expediente: ${d.medical_record}</div>`+
+                    `<div class="small-muted">${d.description || ''}</div>`+
+                    `<div style="margin-top:6px;color:#333">Medicamentos: <span style="color:#666">${d.treatment || ''}</span></div></div>`+
+                    `<div><a class="btn btn-sm btn-secondary" href="/receta">Ver</a> <button class="btn btn-sm btn-danger" onclick="deleteDiagnostic('${d.id}', this)">Eliminar</button></div></div>`;
+            }
+            container.innerHTML = html;
+            // update diagnostics count badge
+            const cntEl = document.getElementById('diag-count');
+            if(cntEl) cntEl.innerText = list.length;
+        }
+
+        async function searchDiagnostics(){
+            const v = document.getElementById('searchMr').value.trim();
+            if(!v) return alert('Ingresa un Portafolio médico para buscar');
+            try{
+                const res = await fetch(`/diagnostic/?medical_record=${encodeURIComponent(v)}`);
+                const data = await res.json();
+                renderDiagnosticsFromList(data);
+            }catch(e){alert('Error buscando');}
+        }
+
+        async function loadInitialDiagnostics(){
+            try{
+                const res = await fetch('/diagnostic/');
+                const data = await res.json();
+                renderDiagnosticsFromList(data.slice(0,10));
+            }catch(e){alert('Error cargando');}
+        }
+    </script>
+
+</body>
+</html>

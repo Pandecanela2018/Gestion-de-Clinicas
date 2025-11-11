@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Query
 from db.models.diagnostic import Diagnostic
 from db.schemas.diagnostic import diagnostics_schema,diagnostic_schema
 from db.client import db_client
@@ -12,7 +12,18 @@ router = APIRouter(prefix="/diagnostic",
                    responses={status.HTTP_404_NOT_FOUND: {"message": "No encontrado"}})
 
 @router.get("/", response_model=list[Diagnostic])
-async def diagnostics():
+async def diagnostics(medical_record: str | None = Query(None, description="Filtrar por medical_record")):
+    """Si se pasa medical_record, filtra por ese valor (acepta string o número). Si no, devuelve todos."""
+    if medical_record:
+        candidates = [medical_record,]
+        try:
+            mr_int = int(medical_record)
+            candidates.append(mr_int)
+            candidates.append(str(mr_int))
+        except Exception:
+            pass
+        cursor = db_client.Prueba.Diagnostic.find({"medical_record": {"$in": candidates}}).sort("date", -1)
+        return diagnostics_schema(cursor)
     return diagnostics_schema(db_client.Prueba.Diagnostic.find())
 
 @router.get("/{id}")

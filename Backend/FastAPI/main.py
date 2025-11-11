@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from routers import doctor, patient, file, schedule, appointment, diagnostic, admin, auth, dashboard_user, calendario, agendar, receta
+from routers import doctor, patient, file, schedule, appointment, diagnostic, admin, auth, dashboard_user, calendario, agendar, receta, historial
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
@@ -33,3 +33,4 @@ app.include_router(dashboard_user.router)
 app.include_router(agendar.router)
 app.include_router(calendario.router)
 app.include_router(receta.router)
+app.include_router(historial.router)
