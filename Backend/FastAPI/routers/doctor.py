@@ -54,7 +54,7 @@ async def doctor(doctor: DoctorP):
     try:
         db_client.Prueba.Doctor.find_one_and_replace({"_id": ObjectId(doctor.id)}, doctor_dict)
     except:
-        return {"error": "No se a actualziado el usuario"}
+        return {"error": "No se a actualizado el usuario"}
     
     return search_doctor("_id", ObjectId(doctor.id))
 
