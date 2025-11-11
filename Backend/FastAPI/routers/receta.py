@@ -8,6 +8,9 @@ from db.schemas.patient import patient_schema
 from db.schemas.diagnostic import diagnostic_schema
 import logging
 
+#Esta viculado supuestamente a diagnostico por ahora, eso debe verse y cambiarse
+
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
