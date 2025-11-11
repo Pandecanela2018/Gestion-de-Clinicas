@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from db.client import db_client
 from db.schemas.Doctor import doctor_schema
+from utils.session import get_session
 from bson import ObjectId
 from datetime import datetime, date
 
@@ -11,10 +12,12 @@ router = APIRouter()
 
 @router.get("/dashboard-doctor", response_class=HTMLResponse)
 async def dashboard_doctor(request: Request):
-    doctor_id = request.cookies.get("doctor_id")
+    session = get_session(request)
     
-    if not doctor_id:
+    if not session or "doctor_id" not in session:
         return RedirectResponse(url="/login-doctor", status_code=302)
+    
+    doctor_id = session["doctor_id"]
     
     try:
         doctor = db_client.Prueba.Doctor.find_one({"_id": ObjectId(doctor_id)})
