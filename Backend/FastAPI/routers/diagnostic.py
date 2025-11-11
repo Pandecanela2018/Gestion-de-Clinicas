@@ -3,6 +3,7 @@ from db.models.diagnostic import Diagnostic
 from db.schemas.diagnostic import diagnostics_schema,diagnostic_schema
 from db.client import db_client
 from bson import ObjectId
+from datetime import datetime
 
 router = APIRouter()
 
@@ -37,6 +38,22 @@ async def diagnostic(diagnostic: Diagnostic):
     diagnostic_dict = dict(diagnostic)
     del diagnostic_dict["id"]
 
+    # Normalize medical_record to int when possible and parse date to datetime
+    try:
+        if "medical_record" in diagnostic_dict:
+            diagnostic_dict["medical_record"] = int(diagnostic_dict["medical_record"])
+    except Exception:
+        # leave as-is if cannot convert
+        pass
+
+    try:
+        if "date" in diagnostic_dict and isinstance(diagnostic_dict["date"], str):
+            # try ISO format
+            diagnostic_dict["date"] = datetime.fromisoformat(diagnostic_dict["date"])
+    except Exception:
+        # leave as-is
+        pass
+
     id = db_client.Prueba.Diagnostic.insert_one(diagnostic_dict).inserted_id
 
     new_diagnostic = diagnostic_schema(db_client.Prueba.Diagnostic.find_one({"_id": id}))
@@ -49,9 +66,21 @@ async def diagnostic(diagnostic: Diagnostic):
     diagnostic_dict = dict(diagnostic)
     del diagnostic_dict["id"]
 
+    # Normalize fields before update as well
+    try:
+        if "medical_record" in diagnostic_dict:
+            diagnostic_dict["medical_record"] = int(diagnostic_dict["medical_record"])
+    except Exception:
+        pass
+    try:
+        if "date" in diagnostic_dict and isinstance(diagnostic_dict["date"], str):
+            diagnostic_dict["date"] = datetime.fromisoformat(diagnostic_dict["date"])
+    except Exception:
+        pass
+
     try:
         db_client.Prueba.Diagnostic.find_one_and_replace({"_id": ObjectId(diagnostic.id)}, diagnostic_dict)
-    except:
+    except Exception:
         return {"error": "No se ha actualizado el diagostico"}
     
     return search_diagnostic("_id", ObjectId(diagnostic.id))

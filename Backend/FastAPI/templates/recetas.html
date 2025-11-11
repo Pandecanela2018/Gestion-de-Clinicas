@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Recetas - Gestión de Clínicas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* reuse calendar/dashboard styles (sidebar etc.) */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body{ font-family:Arial,Helvetica,sans-serif; background:#f5f7fb }
+        .sidebar{ background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%); min-height:100vh; width:220px; position:fixed; left:0; top:0; padding-top:20px }
+        .logo{text-align:center;margin-bottom:40px}
+        .logo img{width:80px;height:80px}
+        .sidebar .nav-item{margin:15px 0;border-left:4px solid transparent}
+        .sidebar .nav-item.active, .sidebar .nav-item:hover{border-left-color:#3498db;background-color:rgba(52,152,219,0.08)}
+        .sidebar .nav-link{color:#ecf0f1;padding:12px 20px;display:flex;align-items:center;gap:15px;text-decoration:none}
+        .main-content{margin-left:220px;padding:30px}
+        .header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:20px;border-radius:8px;margin-bottom:20px}
+        .card-white{background:#fff;border-radius:8px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);border:1px solid #eee}
+        .pres-list .item{border-left:4px solid #667eea;padding:12px;margin-bottom:10px;background:#fafafa;border-radius:6px}
+        .badge-action{cursor:pointer}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo"></div>
+        <nav>
+            <div class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-home"></i><span>Inicio</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="/calendario"><i class="fas fa-calendar-alt"></i><span>Calendario</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="/agendar"><i class="fas fa-plus-circle"></i><span>Agendar Cita</span></a></div>
+            <div class="nav-item active"><a class="nav-link" href="/receta"><i class="fas fa-prescription-bottle"></i><span>Receta</span></a></div>
+            <div class="nav-item"><a class="nav-link" href="#"><i class="fas fa-file-medical"></i><span>Historial Médico</span></a></div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h3>Portal de Paciente</h3>
+            <div>Paciente: {{ patient.name }} {{ patient.surname }}</div>
+            <div style="font-size:13px;color:#e9eef8;margin-top:6px">Portafolio médico: <strong style="color:#fff">{{ patient.file_number }}</strong></div>
+        </div>
+
+        <div class="card-white mb-3">
+            <h4>Mis Recetas Médicas</h4>
+            <p style="color:#666">Aquí podrás visualizar tus recetas y acciones rápidas: imprimir, copiar, enviar por correo o eliminar.</p>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card-white">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <div class="p-3 text-center" style="background:#fff;border-radius:8px;min-width:120px"><i class="fas fa-prescription" style="font-size:22px;color:#667eea"></i><div style="font-weight:bold">{{ diagnostics|length }}</div><div style="font-size:12px;color:#666">Recetas</div></div>
+                        <div class="p-3 text-center" style="background:#fff;border-radius:8px;min-width:120px"><i class="fas fa-check-circle" style="font-size:22px;color:#27ae60"></i><div style="font-weight:bold">0</div><div style="font-size:12px;color:#666">Activas</div></div>
+                        <div class="p-3 text-center" style="background:#fff;border-radius:8px;min-width:120px"><i class="fas fa-bell" style="font-size:22px;color:#e74c3c"></i><div style="font-weight:bold">0</div><div style="font-size:12px;color:#666">Urgentes</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-white mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5>Recetas</h5>
+                <div>
+                    <input id="searchRec" class="form-control" placeholder="Buscar recetas..." style="width:300px" />
+                </div>
+            </div>
+
+            <div id="prescriptions" class="pres-list">
+                {% if diagnostics and diagnostics|length > 0 %}
+                    {% for d in diagnostics %}
+                    <div class="item d-flex justify-content-between align-items-start" data-id="{{ d.id }}">
+                        <div>
+                            <div style="font-size:12px;color:#667eea">{{ d.date }}</div>
+                            <div style="font-weight:bold">Expediente: {{ d.medical_record }}</div>
+                            <div style="margin-top:6px;color:#333">{{ d.description }}</div>
+                            <div style="margin-top:8px;color:#444">Medicamentos: <span style="color:#666">{{ d.treatment }}</span></div>
+                        </div>
+                        <div class="text-end">
+                            <div class="mb-2"><span class="badge bg-secondary badge-action" onclick="printPrescription('{{ d.id }}')"><i class="fas fa-print"></i> Imprimir</span></div>
+                            <div class="mb-2"><span class="badge bg-info text-white badge-action" onclick="copyPrescription('{{ d.id }}')"><i class="fas fa-copy"></i> Copiar</span></div>
+                            <div class="mb-2"><span class="badge bg-success badge-action" onclick="emailPrescription('{{ d.id }}')"><i class="fas fa-envelope"></i> Enviar e-mail</span></div>
+                            <div class="mb-2"><span class="badge bg-warning badge-action" onclick="exportPrescription('{{ d.id }}')"><i class="fas fa-file-export"></i> Exportar</span></div>
+                            <div class="mb-2"><span class="badge bg-danger badge-action" onclick="deletePrescription('{{ d.id }}', this)"><i class="fas fa-trash"></i> Eliminar</span></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="color:#666;padding:12px">No tienes recetas registradas.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function findDiagnosticById(id){
+            const el = document.querySelector(`[data-id=\"${id}\"]`);
+            if(!el) return null;
+            return el;
+        }
+
+        function printPrescription(id){
+            const el = findDiagnosticById(id);
+            if(!el) return alert('No encontrada');
+            const w = window.open('','_blank');
+            w.document.write(`<html><head><title>Receta</title></head><body>${el.innerHTML}</body></html>`);
+            w.document.close();
+            w.print();
+        }
+
+        function copyPrescription(id){
+            const el = findDiagnosticById(id);
+            if(!el) return;
+            const text = el.innerText;
+            navigator.clipboard.writeText(text).then(()=> alert('Copiado al portapapeles'));
+        }
+
+        function emailPrescription(id){
+            const el = findDiagnosticById(id);
+            if(!el) return;
+            const body = encodeURIComponent(el.innerText);
+            window.location.href = `mailto:?subject=Receta&body=${body}`;
+        }
+
+        function exportPrescription(id){
+            const el = findDiagnosticById(id);
+            if(!el) return;
+            const data = { text: el.innerText };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `receta-${id}.json`; a.click(); URL.revokeObjectURL(url);
+        }
+
+        async function deletePrescription(id, button){
+            if(!confirm('Eliminar receta?')) return;
+            try{
+                const res = await fetch(`/diagnostic/${id}`, { method:'DELETE' });
+                if(res.status === 204 || res.ok){
+                    const item = findDiagnosticById(id);
+                    if(item) item.remove();
+                } else {
+                    alert('Error al eliminar');
+                }
+            } catch(e){ alert('Error'); }
+        }
+
+        document.getElementById('searchRec').addEventListener('input', function(e){
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#prescriptions .item').forEach(it => {
+                if(it.innerText.toLowerCase().includes(q)) it.style.display='flex'; else it.style.display='none';
+            });
+        });
+    </script>
+</body>
+</html>
