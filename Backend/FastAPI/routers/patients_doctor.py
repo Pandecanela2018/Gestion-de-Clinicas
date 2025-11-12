@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from db.client import db_client
 from db.schemas.Doctor import doctor_schema
+from db.schemas.patient import patients_schema
 from utils.session import get_session
 from bson import ObjectId
 from datetime import datetime
@@ -104,3 +105,22 @@ async def register_patient_post(
     except Exception as e:
         print(f"Error: {e}")
         return RedirectResponse(url="/login-doctor", status_code=302)
+
+
+@router.get("/doctor/patients", response_class=HTMLResponse)
+async def get_patients_list(request: Request):
+    # Obtener el doctor de la sesión o token
+    doctor = request.session.get("doctor")  # Ajusta según tu autenticación
+    
+    if not doctor:
+        return {"error": "No autenticado"}
+    
+    # Obtener todos los pacientes de la BD
+    patients_data = list(db_client.Prueba.Patient.find())
+    patients = patients_schema(patients_data)
+    
+    return templates.TemplateResponse("patients.html", {
+        "request": request,
+        "doctor": doctor,
+        "patients": patients
+    })

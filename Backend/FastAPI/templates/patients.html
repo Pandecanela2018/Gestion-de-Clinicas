@@ -356,10 +356,16 @@
             <tbody>
               {% for patient in patients %}
               <tr>
-                <td>{{ patient.get('file_number', 'N/A') }}</td>
+                <td>{{ patient.file_number }}</td>
                 <td>{{ patient.name }} {{ patient.surname }}</td>
-                <td>{% if patient.get('birth_date') %}{{ patient.birth_date.strftime('%d/%m/%Y') if patient.birth_date is datetime else patient.birth_date }}{% else %}N/A{% endif %}</td>
-                <td>{{ patient.get('specialty', 'General') }}</td>
+                <td>
+                  {% if patient.birth_date %}
+                    {{ patient.birth_date.strftime('%d/%m/%Y') if patient.birth_date is not string else patient.birth_date }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+                <td>{{ patient.get('blood_type', 'N/A') }}</td>
                 <td>{{ doctor.name }} {{ doctor.surname }}</td>
                 <td>
                   <span class="status-badge status-active">Activo</span>
