@@ -69,9 +69,13 @@ def historial(request: Request):
             diag['date'] = str(dt)
         diagnostics.append(diag)
 
-    # Placeholder arrays for medications/allergies/vaccines (not modelled yet)
-    medications = []
-    allergies = []
-    vaccines = []
+    # Pull medications/allergies/vaccines from patient document (normalize types)
+    medications = patient_doc.get('medications') or []
+    if not isinstance(medications, list):
+        medications = [medications] if medications else []
 
-    return templates.TemplateResponse("historial_medico.html", {"request": request, "patient": patient, "appointments": appointments, "diagnostics": diagnostics, "medications": medications, "allergies": allergies, "vaccines": vaccines})
+    allergies = patient_doc.get('allergies') or []
+    if not isinstance(allergies, list):
+        allergies = [allergies] if allergies else []
+
+    return templates.TemplateResponse("historial_medico.html", {"request": request, "patient": patient, "appointments": appointments, "diagnostics": diagnostics, "medications": medications, "allergies": allergies})

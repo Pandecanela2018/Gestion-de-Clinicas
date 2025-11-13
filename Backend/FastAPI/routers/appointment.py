@@ -38,6 +38,17 @@ async def appointment(appointment: Appointment):
     appointment_dict = dict(appointment)
     del appointment_dict["id"]
 
+    # Try to find patient by name and store patient_id
+    if appointment.patient_name and not appointment_dict.get('patient_id'):
+        try:
+            patient_doc = db_client.Prueba.Patient.find_one({
+                'name': {'$regex': appointment.patient_name.strip().split()[0], '$options': 'i'}
+            })
+            if patient_doc:
+                appointment_dict['patient_id'] = str(patient_doc['_id'])
+        except Exception as e:
+            print(f'Warning: could not find patient by name {appointment.patient_name}: {e}')
+
     id = db_client.Prueba.Appointment.insert_one(appointment_dict).inserted_id
 
     new_appointment = appointment_schema(db_client.Prueba.Appointment.find_one({"_id": id}))

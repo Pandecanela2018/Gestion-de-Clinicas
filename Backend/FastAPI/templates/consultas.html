@@ -1,762 +1,835 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Consultas - Doctor</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultas - Doctor</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
-    body {
-      background-color: #f5f5f5;
-      font-family: Arial, sans-serif;
-    }
-
-    .container-main {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 200px;
-      background-color: #f8f8f8;
-      padding: 20px;
-      border-right: 1px solid #ddd;
-    }
-
-    .logo {
-      text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .logo img {
-      width: 100px;
-      height: auto;
-    }
-
-    .nav-menu {
-      list-style: none;
-    }
-
-    .nav-item {
-      margin-bottom: 15px;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      background-color: #e8e8e8;
-      border-radius: 6px;
-      text-decoration: none;
-      color: #333;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background-color 0.3s;
-    }
-
-    .nav-link:hover,
-    .nav-link.active {
-      background-color: #333;
-      color: white;
-    }
-
-    .nav-link i {
-      margin-right: 10px;
-      width: 20px;
-    }
-
-    .doctor-profile {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-      text-align: center;
-    }
-
-    .doctor-avatar {
-      width: 80px;
-      height: 80px;
-      background-color: #007bff;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 32px;
-    }
-
-    .doctor-name {
-      font-weight: 600;
-      color: #333;
-      font-size: 14px;
-    }
-
-    .doctor-specialty {
-      color: #666;
-      font-size: 12px;
-    }
-
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .header h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: #333;
-      margin: 0;
-    }
-
-    .header-subtitle {
-      color: #666;
-      font-size: 14px;
-    }
-
-    /* Two Column Layout */
-    .consultation-container {
-      display: flex;
-      gap: 20px;
-      flex: 1;
-    }
-
-    .left-panel {
-      width: 300px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .left-panel-header {
-      padding: 20px;
-      border-bottom: 2px solid #f0f0f0;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .consultations-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .consultation-item {
-      padding: 15px;
-      border-bottom: 1px solid #f0f0f0;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .consultation-item:hover {
-      background-color: #f9f9f9;
-    }
-
-    .consultation-item.active {
-      background-color: #007bff;
-      color: white;
-      border-bottom-color: #007bff;
-    }
-
-    .consultation-item-name {
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .consultation-item-date {
-      font-size: 12px;
-      color: #999;
-    }
-
-    .consultation-item.active .consultation-item-date {
-      color: #e0e0e0;
-    }
-
-    .right-panel {
-      flex: 1;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .patient-header {
-      padding: 20px;
-      border-bottom: 2px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .patient-avatar {
-      width: 60px;
-      height: 60px;
-      background-color: #007bff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .patient-info h2 {
-      font-size: 18px;
-      margin: 0;
-      color: #333;
-    }
-
-    .patient-info-details {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .panel-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      border-bottom: 2px solid #f0f0f0;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #999;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .tab-btn.active {
-      color: #007bff;
-      border-bottom: 3px solid #007bff;
-      padding-bottom: 5px;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: #333;
-      font-size: 13px;
-    }
-
-    .form-group textarea,
-    .form-group input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 13px;
-      font-family: Arial, sans-serif;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .form-group textarea:focus,
-    .form-group input:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-    }
-
-    .btn-save {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      width: 100%;
-      transition: background-color 0.3s;
-    }
-
-    .btn-save:hover {
-      background-color: #0056b3;
-    }
-
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #999;
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      margin-bottom: 20px;
-      color: #ddd;
-    }
-
-    @media (max-width: 1024px) {
-      .consultation-container {
-        flex-direction: column;
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      .left-panel {
-        width: 100%;
-        max-height: 200px;
+      body {
+        background-color: #f5f5f5;
+        font-family: Arial, sans-serif;
       }
-    }
 
-    @media (max-width: 768px) {
       .container-main {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 200px;
+        background-color: #f8f8f8;
+        padding: 20px;
+        border-right: 1px solid #ddd;
+      }
+
+      .logo {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .logo img {
+        width: 100px;
+        height: auto;
+      }
+
+      .nav-menu {
+        list-style: none;
+      }
+
+      .nav-item {
+        margin-bottom: 15px;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        background-color: #e8e8e8;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background-color: #333;
+        color: white;
+      }
+
+      .nav-link i {
+        margin-right: 10px;
+        width: 20px;
+      }
+
+      .doctor-profile {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+      }
+
+      .doctor-avatar {
+        width: 80px;
+        height: 80px;
+        background-color: #007bff;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+      }
+
+      .doctor-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .doctor-specialty {
+        color: #666;
+        font-size: 12px;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        padding: 30px;
+        display: flex;
         flex-direction: column;
       }
 
-      .sidebar {
-        width: 100%;
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+
+      .header-subtitle {
+        color: #666;
+        font-size: 14px;
+      }
+
+      /* Two Column Layout */
+      .consultation-container {
+        display: flex;
+        gap: 20px;
+        flex: 1;
       }
 
       .left-panel {
-        width: 100%;
+        width: 300px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
-    }
-  </style>
-</head>
-<body>
 
-  <div class="container-main">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="logo">
-        <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Gobierno" />
+      .left-panel-header {
+        padding: 20px;
+        border-bottom: 2px solid #f0f0f0;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .consultations-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .consultation-item {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .consultation-item:hover {
+        background-color: #f9f9f9;
+      }
+
+      .consultation-item.active {
+        background-color: #007bff;
+        color: white;
+        border-bottom-color: #007bff;
+      }
+
+      .consultation-item-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .consultation-item-date {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .consultation-item.active .consultation-item-date {
+        color: #e0e0e0;
+      }
+
+      .right-panel {
+        flex: 1;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .patient-header {
+        padding: 20px;
+        border-bottom: 2px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .patient-avatar {
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .patient-info h2 {
+        font-size: 18px;
+        margin: 0;
+        color: #333;
+      }
+
+      .patient-info-details {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .panel-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+      }
+
+      .tab-btn {
+        background: none;
+        border: none;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .tab-btn.active {
+        color: #007bff;
+        border-bottom: 3px solid #007bff;
+        padding-bottom: 5px;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 13px;
+      }
+
+      .form-group textarea,
+      .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+      }
+
+      .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .form-group textarea:focus,
+      .form-group input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+      }
+
+      .btn-save {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        width: 100%;
+        transition: background-color 0.3s;
+      }
+
+      .btn-save:hover {
+        background-color: #0056b3;
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #999;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #ddd;
+      }
+
+      @media (max-width: 1024px) {
+        .consultation-container {
+          flex-direction: column;
+        }
+
+        .left-panel {
+          width: 100%;
+          max-height: 200px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container-main {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+        }
+
+        .left-panel {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-main">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="logo">
+          <img
+            src="{{ url_for('static', path='/img/logosv.jpg') }}"
+            alt="Gobierno"
+          />
+        </div>
+
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="/dashboard-doctor" class="nav-link">
+              <i class="fas fa-chart-line"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/doctor/patients" class="nav-link">
+              <i class="fas fa-users"></i>
+              Pacientes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/consultations" class="nav-link active">
+              <i class="fas fa-stethoscope"></i>
+              Consultas
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/expedientes" class="nav-link">
+              <i class="fas fa-file-medical"></i>
+              Expedientes
+            </a>
+          </li>
+        </ul>
+
+        <div class="doctor-profile">
+          <div class="doctor-avatar">{{ doctor.name[0].upper() }}</div>
+          <p class="doctor-name">{{ doctor.name }} {{ doctor.surname }}</p>
+          <p class="doctor-specialty">{{ doctor.speciality }}</p>
+        </div>
       </div>
 
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <a href="/dashboard-doctor" class="nav-link">
-            <i class="fas fa-chart-line"></i>
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/doctor/patients" class="nav-link">
-            <i class="fas fa-users"></i>
-            Pacientes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fas fa-calendar-alt"></i>
-            Citas Médicas
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/consultations" class="nav-link active">
-            <i class="fas fa-stethoscope"></i>
-            Consultas
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/doctor/patients" class="nav-link">
-            <i class="fas fa-file-medical"></i>
-            Expedientes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fas fa-file-alt"></i>
-            Reportes
-          </a>
-        </li>
-      </ul>
-
-      <div class="doctor-profile">
-        <div class="doctor-avatar">
-          {{ doctor.name[0].upper() }}
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+          <div>
+            <h1>Consultas</h1>
+            <p class="header-subtitle">
+              Bienvenido de vuelta, Dr. {{ doctor.name }}
+            </p>
+          </div>
         </div>
-        <p class="doctor-name">{{ doctor.name }} {{ doctor.surname }}</p>
-        <p class="doctor-specialty">{{ doctor.speciality }}</p>
+
+        <!-- Two Column Consultation Layout -->
+        <div class="consultation-container">
+          <!-- Left Panel: Consultations List -->
+          <div class="left-panel">
+            <div class="left-panel-header">
+              <i class="fas fa-list"></i> Consultas Confirmadas
+            </div>
+            <div class="consultations-list" id="consultationsList">
+              <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Cargando consultas...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel: Consultation Details -->
+          <div class="right-panel">
+            <div id="emptyState" class="empty-state">
+              <i class="fas fa-clipboard"></i>
+              <p>Selecciona una consulta para ver detalles</p>
+            </div>
+
+            <div
+              id="consultationDetail"
+              style="
+                display: none;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+              "
+            >
+              <!-- Patient Header -->
+              <div class="patient-header">
+                <div class="patient-avatar" id="patientAvatar">P</div>
+                <div class="patient-info">
+                  <h2 id="patientName">Paciente</h2>
+                  <div class="patient-info-details">
+                    <div>Edad: <span id="patientAge">-</span> años</div>
+                    <div>Expediente: <span id="fileNumber">-</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabs and Content -->
+              <div class="panel-content">
+                <div class="tabs">
+                  <button class="tab-btn active" data-tab="historia">
+                    Historia
+                  </button>
+                  <button class="tab-btn" data-tab="exploracion">
+                    Exploración
+                  </button>
+                  <button class="tab-btn" data-tab="diagnostico">
+                    Diagnóstico
+                  </button>
+                  <button class="tab-btn" data-tab="laboratorio">
+                    Laboratorio
+                  </button>
+                  <button class="tab-btn" data-tab="recetas">Recetas</button>
+                  <button class="tab-btn" data-tab="seguimiento">
+                    Seguimiento
+                  </button>
+                </div>
+
+                <!-- Historia Tab -->
+                <div class="tab-content active" id="historia">
+                  <div class="form-group">
+                    <label>Motivo de Consulta</label>
+                    <textarea
+                      id="motivo"
+                      placeholder="Ingrese el motivo de la consulta"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Antecedentes</label>
+                    <textarea
+                      id="antecedentes"
+                      placeholder="Ingrese antecedentes médicos relevantes"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Exploración Tab -->
+                <div class="tab-content" id="exploracion">
+                  <div class="form-group">
+                    <label>Presión Arterial (mmHg)</label>
+                    <input type="text" id="presion" placeholder="Ej: 120/80" />
+                  </div>
+                  <div class="form-group">
+                    <label>Frecuencia Cardíaca (bpm)</label>
+                    <input type="number" id="frecuencia" placeholder="Ej: 70" />
+                  </div>
+                  <div class="form-group">
+                    <label>Temperatura (°C)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="temperatura"
+                      placeholder="Ej: 37.0"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="peso"
+                      placeholder="Ej: 70.5"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Talla (cm)</label>
+                    <input type="number" id="talla" placeholder="Ej: 175" />
+                  </div>
+                  <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea
+                      id="observaciones"
+                      placeholder="Observaciones de la exploración física"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Diagnóstico Tab -->
+                <div class="tab-content" id="diagnostico">
+                  <div class="form-group">
+                    <label>Diagnóstico Principal</label>
+                    <textarea
+                      id="diagnosticoPrincipal"
+                      placeholder="Ingrese el diagnóstico principal"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Diagnósticos Secundarios</label>
+                    <textarea
+                      id="diagnosticoSecundario"
+                      placeholder="Ingrese diagnósticos secundarios si los hay"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Laboratorio Tab -->
+                <div class="tab-content" id="laboratorio">
+                  <div class="form-group">
+                    <label>Exámenes Solicitados</label>
+                    <textarea
+                      id="examenes"
+                      placeholder="Ingrese los exámenes de laboratorio solicitados"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Resultados</label>
+                    <textarea
+                      id="resultados"
+                      placeholder="Ingrese los resultados de los exámenes"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Recetas Tab -->
+                <div class="tab-content" id="recetas">
+                  <div class="form-group">
+                    <label>Medicamentos Prescritos</label>
+                    <textarea
+                      id="medicamentos"
+                      placeholder="Ingrese medicamentos prescritos con dosis y duración"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Seguimiento Tab -->
+                <div class="tab-content" id="seguimiento">
+                  <div class="form-group">
+                    <label>Plan de Seguimiento</label>
+                    <textarea
+                      id="seguimiento"
+                      placeholder="Ingrese el plan de seguimiento y recomendaciones"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Próxima Cita (Días)</label>
+                    <input type="number" id="proximaCita" placeholder="Ej: 7" />
+                  </div>
+                </div>
+
+                <button class="btn-save" id="btnSave">Guardar Consulta</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Header -->
-      <div class="header">
-        <div>
-          <h1>Consultas</h1>
-          <p class="header-subtitle">Bienvenido de vuelta, Dr. {{ doctor.name }}</p>
-        </div>
-      </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let consultations = [];
+      let currentConsultationId = null;
 
-      <!-- Two Column Consultation Layout -->
-      <div class="consultation-container">
-        <!-- Left Panel: Consultations List -->
-        <div class="left-panel">
-          <div class="left-panel-header">
-            <i class="fas fa-list"></i> Consultas Confirmadas
-          </div>
-          <div class="consultations-list" id="consultationsList">
-            <div class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <p>Cargando consultas...</p>
-            </div>
-          </div>
-        </div>
+      // Load confirmed consultations
+      async function loadConsultations() {
+        try {
+          const res = await fetch("/doctor/appointments/confirmed");
+          if (!res.ok) throw new Error("Error fetching consultations");
 
-        <!-- Right Panel: Consultation Details -->
-        <div class="right-panel">
-          <div id="emptyState" class="empty-state">
-            <i class="fas fa-clipboard"></i>
-            <p>Selecciona una consulta para ver detalles</p>
-          </div>
-
-          <div id="consultationDetail" style="display: none; flex: 1; display: flex; flex-direction: column;">
-            <!-- Patient Header -->
-            <div class="patient-header">
-              <div class="patient-avatar" id="patientAvatar">P</div>
-              <div class="patient-info">
-                <h2 id="patientName">Paciente</h2>
-                <div class="patient-info-details">
-                  <div>Edad: <span id="patientAge">-</span> años</div>
-                  <div>Expediente: <span id="fileNumber">-</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tabs and Content -->
-            <div class="panel-content">
-              <div class="tabs">
-                <button class="tab-btn active" data-tab="historia">Historia</button>
-                <button class="tab-btn" data-tab="exploracion">Exploración</button>
-                <button class="tab-btn" data-tab="diagnostico">Diagnóstico</button>
-                <button class="tab-btn" data-tab="laboratorio">Laboratorio</button>
-                <button class="tab-btn" data-tab="recetas">Recetas</button>
-                <button class="tab-btn" data-tab="seguimiento">Seguimiento</button>
-              </div>
-
-              <!-- Historia Tab -->
-              <div class="tab-content active" id="historia">
-                <div class="form-group">
-                  <label>Motivo de Consulta</label>
-                  <textarea id="motivo" placeholder="Ingrese el motivo de la consulta"></textarea>
-                </div>
-                <div class="form-group">
-                  <label>Antecedentes</label>
-                  <textarea id="antecedentes" placeholder="Ingrese antecedentes médicos relevantes"></textarea>
-                </div>
-              </div>
-
-              <!-- Exploración Tab -->
-              <div class="tab-content" id="exploracion">
-                <div class="form-group">
-                  <label>Presión Arterial (mmHg)</label>
-                  <input type="text" id="presion" placeholder="Ej: 120/80" />
-                </div>
-                <div class="form-group">
-                  <label>Frecuencia Cardíaca (bpm)</label>
-                  <input type="number" id="frecuencia" placeholder="Ej: 70" />
-                </div>
-                <div class="form-group">
-                  <label>Temperatura (°C)</label>
-                  <input type="number" step="0.1" id="temperatura" placeholder="Ej: 37.0" />
-                </div>
-                <div class="form-group">
-                  <label>Peso (kg)</label>
-                  <input type="number" step="0.1" id="peso" placeholder="Ej: 70.5" />
-                </div>
-                <div class="form-group">
-                  <label>Talla (cm)</label>
-                  <input type="number" id="talla" placeholder="Ej: 175" />
-                </div>
-                <div class="form-group">
-                  <label>Observaciones</label>
-                  <textarea id="observaciones" placeholder="Observaciones de la exploración física"></textarea>
-                </div>
-              </div>
-
-              <!-- Diagnóstico Tab -->
-              <div class="tab-content" id="diagnostico">
-                <div class="form-group">
-                  <label>Diagnóstico Principal</label>
-                  <textarea id="diagnosticoPrincipal" placeholder="Ingrese el diagnóstico principal"></textarea>
-                </div>
-                <div class="form-group">
-                  <label>Diagnósticos Secundarios</label>
-                  <textarea id="diagnosticoSecundario" placeholder="Ingrese diagnósticos secundarios si los hay"></textarea>
-                </div>
-              </div>
-
-              <!-- Laboratorio Tab -->
-              <div class="tab-content" id="laboratorio">
-                <div class="form-group">
-                  <label>Exámenes Solicitados</label>
-                  <textarea id="examenes" placeholder="Ingrese los exámenes de laboratorio solicitados"></textarea>
-                </div>
-                <div class="form-group">
-                  <label>Resultados</label>
-                  <textarea id="resultados" placeholder="Ingrese los resultados de los exámenes"></textarea>
-                </div>
-              </div>
-
-              <!-- Recetas Tab -->
-              <div class="tab-content" id="recetas">
-                <div class="form-group">
-                  <label>Medicamentos Prescritos</label>
-                  <textarea id="medicamentos" placeholder="Ingrese medicamentos prescritos con dosis y duración"></textarea>
-                </div>
-              </div>
-
-              <!-- Seguimiento Tab -->
-              <div class="tab-content" id="seguimiento">
-                <div class="form-group">
-                  <label>Plan de Seguimiento</label>
-                  <textarea id="seguimiento" placeholder="Ingrese el plan de seguimiento y recomendaciones"></textarea>
-                </div>
-                <div class="form-group">
-                  <label>Próxima Cita (Días)</label>
-                  <input type="number" id="proximaCita" placeholder="Ej: 7" />
-                </div>
-              </div>
-
-              <button class="btn-save" id="btnSave">Guardar Consulta</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    let consultations = [];
-    let currentConsultationId = null;
-
-    // Load confirmed consultations
-    async function loadConsultations() {
-      try {
-        const res = await fetch('/doctor/appointments/confirmed');
-        if (!res.ok) throw new Error('Error fetching consultations');
-        
-        consultations = await res.json();
-        renderConsultations();
-      } catch (e) {
-        console.error(e);
-        document.getElementById('consultationsList').innerHTML = `
+          consultations = await res.json();
+          renderConsultations();
+        } catch (e) {
+          console.error(e);
+          document.getElementById("consultationsList").innerHTML = `
           <div class="empty-state">
             <i class="fas fa-exclamation-circle"></i>
             <p>Error al cargar consultas</p>
           </div>
         `;
+        }
       }
-    }
 
-    // Render consultations list
-    function renderConsultations() {
-      const list = document.getElementById('consultationsList');
-      
-      if (!consultations.length) {
-        list.innerHTML = `
+      // Render consultations list
+      function renderConsultations() {
+        const list = document.getElementById("consultationsList");
+
+        if (!consultations.length) {
+          list.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-inbox"></i>
             <p>No hay consultas confirmadas</p>
           </div>
         `;
-        return;
-      }
+          return;
+        }
 
-      list.innerHTML = consultations.map(c => `
+        list.innerHTML = consultations
+          .map(
+            (c) => `
         <div class="consultation-item" data-id="${c.id}">
           <div class="consultation-item-name">${c.patient_name}</div>
           <div class="consultation-item-date">${c.date} ${c.time}</div>
         </div>
-      `).join('');
+      `
+          )
+          .join("");
 
-      list.querySelectorAll('.consultation-item').forEach(item => {
-        item.addEventListener('click', () => selectConsultation(item.getAttribute('data-id')));
-      });
-    }
-
-    // Select consultation and load details
-    async function selectConsultation(id) {
-      currentConsultationId = id;
-      
-      // Update UI
-      document.querySelectorAll('.consultation-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      document.querySelector(`[data-id="${id}"]`).classList.add('active');
-
-      // Load details
-      try {
-        const res = await fetch(`/doctor/appointments/${id}/details`);
-        if (!res.ok) throw new Error('Error fetching details');
-        
-        const data = await res.json();
-        displayConsultationDetails(data);
-      } catch (e) {
-        console.error(e);
-        alert('Error al cargar los detalles de la consulta');
-      }
-    }
-
-    // Display consultation details
-    function displayConsultationDetails(data) {
-      document.getElementById('emptyState').style.display = 'none';
-      document.getElementById('consultationDetail').style.display = 'flex';
-
-      if (data.patient) {
-        const age = calculateAge(data.patient.birth_date);
-        document.getElementById('patientAvatar').textContent = data.patient.name[0].toUpperCase();
-        document.getElementById('patientName').textContent = `${data.patient.name} ${data.patient.surname}`;
-        document.getElementById('patientAge').textContent = age;
-        document.getElementById('fileNumber').textContent = data.patient.file_number;
-      }
-
-      // Clear form fields
-      document.getElementById('motivo').value = '';
-      document.getElementById('antecedentes').value = '';
-      // ... clear other fields as needed
-    }
-
-    // Calculate age from birth date
-    function calculateAge(birthDate) {
-      const today = new Date();
-      const birth = new Date(birthDate);
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-      }
-      return age;
-    }
-
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        
-        btn.classList.add('active');
-        const tabId = btn.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
-    });
-
-    // Save consultation
-    document.getElementById('btnSave').addEventListener('click', async () => {
-      if (!currentConsultationId) {
-        alert('Seleccione una consulta primero');
-        return;
-      }
-
-      const payload = {
-        historia: {
-          motivo: document.getElementById('motivo').value,
-          antecedentes: document.getElementById('antecedentes').value,
-        },
-        exploracion: {
-          presion: document.getElementById('presion').value,
-          frecuencia: document.getElementById('frecuencia').value,
-          temperatura: document.getElementById('temperatura').value,
-          peso: document.getElementById('peso').value,
-          talla: document.getElementById('talla').value,
-          observaciones: document.getElementById('observaciones').value
-        },
-        diagnostico: {
-          principal: document.getElementById('diagnosticoPrincipal').value,
-          secundarios: document.getElementById('diagnosticoSecundario').value
-        },
-        laboratorio: {
-          examenes: document.getElementById('examenes').value,
-          resultados: document.getElementById('resultados').value
-        },
-        recetas: {
-          medicamentos: document.getElementById('medicamentos').value
-        },
-        seguimiento: {
-          plan: document.getElementById('seguimiento').value,
-          proximaCitaDias: document.getElementById('proximaCita').value
-        }
-      };
-
-      try {
-        const res = await fetch(`/consultations/${currentConsultationId}/save`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        list.querySelectorAll(".consultation-item").forEach((item) => {
+          item.addEventListener("click", () =>
+            selectConsultation(item.getAttribute("data-id"))
+          );
         });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error saving consultation');
-
-        alert('Consulta guardada correctamente');
-
-        // Optionally remove the saved appointment from the list
-        consultations = consultations.filter(c => c.id !== currentConsultationId);
-        currentConsultationId = null;
-        renderConsultations();
-
-        // Reset detail panel
-        document.getElementById('consultationDetail').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'flex';
-      } catch (e) {
-        console.error(e);
-        alert('Error al guardar la consulta');
       }
-    });
 
-    // Initialize
-    loadConsultations();
-  </script>
+      // Select consultation and load details
+      async function selectConsultation(id) {
+        currentConsultationId = id;
 
-</body>
+        // Update UI
+        document.querySelectorAll(".consultation-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+        document.querySelector(`[data-id="${id}"]`).classList.add("active");
+
+        // Load details
+        try {
+          const res = await fetch(`/doctor/appointments/${id}/details`);
+          if (!res.ok) throw new Error("Error fetching details");
+
+          const data = await res.json();
+          displayConsultationDetails(data);
+        } catch (e) {
+          console.error(e);
+          alert("Error al cargar los detalles de la consulta");
+        }
+      }
+
+      // Display consultation details
+      function displayConsultationDetails(data) {
+        document.getElementById("emptyState").style.display = "none";
+        document.getElementById("consultationDetail").style.display = "flex";
+
+        if (data.patient) {
+          const age = calculateAge(data.patient.birth_date);
+          document.getElementById("patientAvatar").textContent =
+            data.patient.name[0].toUpperCase();
+          document.getElementById(
+            "patientName"
+          ).textContent = `${data.patient.name} ${data.patient.surname}`;
+          document.getElementById("patientAge").textContent = age;
+          document.getElementById("fileNumber").textContent =
+            data.patient.file_number;
+        }
+
+        // Clear form fields
+        document.getElementById("motivo").value = "";
+        document.getElementById("antecedentes").value = "";
+        // ... clear other fields as needed
+      }
+
+      // Calculate age from birth date
+      function calculateAge(birthDate) {
+        const today = new Date();
+        const birth = new Date(birthDate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birth.getDate())
+        ) {
+          age--;
+        }
+        return age;
+      }
+
+      // Tab switching
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+
+          btn.classList.add("active");
+          const tabId = btn.getAttribute("data-tab");
+          document.getElementById(tabId).classList.add("active");
+        });
+      });
+
+      // Save consultation
+      document.getElementById("btnSave").addEventListener("click", async () => {
+        if (!currentConsultationId) {
+          alert("Seleccione una consulta primero");
+          return;
+        }
+
+        const payload = {
+          historia: {
+            motivo: document.getElementById("motivo").value,
+            antecedentes: document.getElementById("antecedentes").value,
+          },
+          exploracion: {
+            presion: document.getElementById("presion").value,
+            frecuencia: document.getElementById("frecuencia").value,
+            temperatura: document.getElementById("temperatura").value,
+            peso: document.getElementById("peso").value,
+            talla: document.getElementById("talla").value,
+            observaciones: document.getElementById("observaciones").value,
+          },
+          diagnostico: {
+            principal: document.getElementById("diagnosticoPrincipal").value,
+            secundarios: document.getElementById("diagnosticoSecundario").value,
+          },
+          laboratorio: {
+            examenes: document.getElementById("examenes").value,
+            resultados: document.getElementById("resultados").value,
+          },
+          recetas: {
+            medicamentos: document.getElementById("medicamentos").value,
+          },
+          seguimiento: {
+            plan: document.getElementById("seguimiento").value,
+            proximaCitaDias: document.getElementById("proximaCita").value,
+          },
+        };
+
+        try {
+          const res = await fetch(
+            `/consultations/${currentConsultationId}/save`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          const data = await res.json();
+          if (!res.ok)
+            throw new Error(data.error || "Error saving consultation");
+
+          alert("Consulta guardada correctamente");
+
+          // Optionally remove the saved appointment from the list
+          consultations = consultations.filter(
+            (c) => c.id !== currentConsultationId
+          );
+          currentConsultationId = null;
+          renderConsultations();
+
+          // Reset detail panel
+          document.getElementById("consultationDetail").style.display = "none";
+          document.getElementById("emptyState").style.display = "flex";
+        } catch (e) {
+          console.error(e);
+          alert("Error al guardar la consulta");
+        }
+      });
+
+      // Initialize
+      loadConsultations();
+    </script>
+  </body>
 </html>

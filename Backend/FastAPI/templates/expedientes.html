@@ -5,28 +5,197 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Expediente - {{ patient.name }} {{ patient.surname }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    body { background:#f5f7fa; font-family: Arial, sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      background:#f5f5f5; 
+      font-family: Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #f8f8f8;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .logo img {
+      width: 80px;
+      height: auto;
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 15px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      background-color: #e8e8e8;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: #333;
+      color: white;
+    }
+
+    .nav-link i {
+      margin-right: 10px;
+      width: 20px;
+    }
+
+    .doctor-profile {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .doctor-avatar {
+      width: 60px;
+      height: 60px;
+      background-color: #007bff;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+    }
+
+    .doctor-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 12px;
+    }
+
+    .doctor-specialty {
+      color: #666;
+      font-size: 11px;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 200px;
+      padding: 30px;
+    }
+
     .header-card { background: #fff; padding:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
     .profile-avatar { width:80px; height:80px; border-radius:50%; background:#007bff; color:#fff; display:flex;align-items:center;justify-content:center;font-size:32px }
     .tabs { margin-top:20px }
     .tab-content-card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
     .med-item { border-bottom:1px solid #eef2f6; padding:12px 0 }
+    
+    .back-button {
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container my-4">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Gobierno" />
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/dashboard-doctor" class="nav-link">
+          <i class="fas fa-chart-line"></i>
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/doctor/patients" class="nav-link">
+          <i class="fas fa-users"></i>
+          Pacientes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/consultations" class="nav-link">
+          <i class="fas fa-stethoscope"></i>
+          Consultas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/expedientes" class="nav-link active">
+          <i class="fas fa-file-medical"></i>
+          Expedientes
+        </a>
+      </li>
+    </ul>
+
+    <div class="doctor-profile">
+      <div class="doctor-avatar">{{ doctor.name[0].upper() if doctor.name else 'D' }}</div>
+      <p class="doctor-name">{{ doctor.name or 'Doctor' }} {{ doctor.surname or '' }}</p>
+      <p class="doctor-specialty">{{ doctor.speciality or 'Especialista' }}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="back-button">
+      <a href="/expedientes" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Volver a Expedientes
+      </a>
+    </div>
+
+    <div class="container-fluid my-4">
     <div class="row g-3">
       <div class="col-12 header-card">
         <div class="d-flex align-items-center">
-          <div class="profile-avatar me-3">{{ patient.name[0].upper() }}</div>
+          <div class="profile-avatar me-3">{{ patient.name[0].upper() if patient.name else 'P' }}</div>
           <div>
             <h3 class="mb-0">{{ patient.name }} {{ patient.surname }}{% if patient.second_surname %} {{ patient.second_surname }}{% endif %}</h3>
-            <div class="text-muted">Expediente: {{ patient.file_number }} • Edad: {{ ( ( (utcnow()|string)|int ) ) }}</div>
+            <div class="text-muted">Expediente: {{ patient.file_number or 'N/A' }}</div>
             <div class="mt-2 small text-muted">
-              <span class="me-3">Genero: {{ patient.gender }}</span>
-              <span class="me-3">DUI: {{ patient.dui }}</span>
-              <span class="me-3">Nacimiento: {{ patient.birth_date }}</span>
+              <span class="me-3">Genero: {{ patient.gender or 'N/A' }}</span>
+              <span class="me-3">DUI: {{ patient.dui or 'N/A' }}</span>
+              <span class="me-3">Nacimiento: {% if patient.birth_date %}{{ patient.birth_date.strftime('%d/%m/%Y') if patient.birth_date.strftime else patient.birth_date }}{% else %}N/A{% endif %}</span>
             </div>
           </div>
           <div class="ms-auto text-end">
@@ -35,9 +204,9 @@
           </div>
         </div>
         <div class="row mt-3">
-          <div class="col-md-3 small text-muted">Tel: {{ patient.phone }}</div>
-          <div class="col-md-5 small text-muted">Dirección: {{ patient.address }}, {{ patient.city }}</div>
-          <div class="col-md-4 small text-muted text-end">Contacto emergencia: {{ patient.emergency_name }} - {{ patient.emergency_phone }}</div>
+          <div class="col-md-3 small text-muted">Tel: {{ patient.phone or 'N/A' }}</div>
+          <div class="col-md-5 small text-muted">Dirección: {{ patient.address or 'N/A' }}, {{ patient.city or 'N/A' }}</div>
+          <div class="col-md-4 small text-muted text-end">Contacto emergencia: {{ patient.emergency_name or 'N/A' }} - {{ patient.emergency_phone or 'N/A' }}</div>
         </div>
       </div>
 
@@ -60,8 +229,8 @@
                 <div class="list-group-item">
                   <div class="d-flex justify-content-between">
                     <div>
-                      <strong>{{ c.created_at }}</strong>
-                      <div class="text-muted">Diagnóstico: {{ c.diagnostico.principal if c.diagnostico and c.diagnostico.principal else '-' }}</div>
+                      <strong>{{ c.created_at or 'N/A' }}</strong>
+                      <div class="text-muted">Diagnóstico: {{ c.diagnostico.principal if c.diagnostico and c.diagnostico.get('principal') else '-' }}</div>
                     </div>
                     <div class="text-end">
                       <a class="btn btn-sm btn-outline-secondary" href="#" onclick="showConsult('{{ c.id }}')">Ver</a>
@@ -93,12 +262,20 @@
         <div id="medicamentos" class="tab-content-card" style="display:none">
           <h5>Medicamentos actuales</h5>
           {% if patient.medications %}
-            {% for m in patient.medications %}
-              <div class="med-item">
-                <div><strong>{{ m.name }}</strong></div>
-                <div class="text-muted small">{{ m.dose }} • {{ m.instructions }}</div>
-              </div>
-            {% endfor %}
+            {% if patient.medications is string %}
+              <div class="med-item">{{ patient.medications }}</div>
+            {% else %}
+              {% for m in patient.medications %}
+                <div class="med-item">
+                  {% if m is string %}
+                    <div>{{ m }}</div>
+                  {% else %}
+                    <div><strong>{{ m.get('name', 'N/A') }}</strong></div>
+                    <div class="text-muted small">{{ m.get('dose', '') }} • {{ m.get('instructions', '') }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% endif %}
           {% else %}
             <div class="text-muted">No hay medicamentos registrados</div>
           {% endif %}
@@ -127,19 +304,35 @@
             <div class="row">
               <div class="col-md-6">
                 <h6>Enfermedades crónicas</h6>
-                <ul>
-                  {% for d in patient.chronic_diseases or [] %}
-                    <li>{{ d }}</li>
-                  {% endfor %}
-                </ul>
+                {% if patient.chronic_diseases %}
+                  {% if patient.chronic_diseases is string %}
+                    <p>{{ patient.chronic_diseases }}</p>
+                  {% else %}
+                    <ul>
+                      {% for d in patient.chronic_diseases %}
+                        <li>{{ d }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% else %}
+                  <p class="text-muted">No especificado</p>
+                {% endif %}
               </div>
               <div class="col-md-6">
                 <h6>Alergias</h6>
-                <ul>
-                  {% for a in patient.allergies or [] %}
-                    <li>{{ a }}</li>
-                  {% endfor %}
-                </ul>
+                {% if patient.allergies %}
+                  {% if patient.allergies is string %}
+                    <p>{{ patient.allergies }}</p>
+                  {% else %}
+                    <ul>
+                      {% for a in patient.allergies %}
+                        <li>{{ a }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% else %}
+                  <p class="text-muted">No especificado</p>
+                {% endif %}
               </div>
             </div>
           {% else %}
@@ -166,5 +359,7 @@
       document.querySelector('[data-tab="diagnosticos"]').click();
     }
   </script>
+    </div> <!-- cierre main-content -->
+  </div>
 </body>
 </html>

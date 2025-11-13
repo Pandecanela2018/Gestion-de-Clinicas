@@ -30,7 +30,7 @@
             <div class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-home"></i><span>Inicio</span></a></div>
             <div class="nav-item"><a class="nav-link" href="/calendario"><i class="fas fa-calendar-alt"></i><span>Calendario</span></a></div>
             <div class="nav-item"><a class="nav-link" href="/agendar"><i class="fas fa-plus-circle"></i><span>Agendar Cita</span></a></div>
-            <div class="nav-item"><a class="nav-link" href="/receta"><i class="fas fa-prescription-bottle"></i><span>Receta</span></a></div>
+            
             <div class="nav-item active"><a class="nav-link" href="/historial"><i class="fas fa-file-medical"></i><span>Historial Médico</span></a></div>
         </nav>
     </div>
@@ -54,7 +54,7 @@
                 <button id="btn-diagnosticos" class="btn btn-light" data-section="diagnosticos" onclick="showSection('diagnosticos')"><i class="fas fa-notes-medical"></i> Diagnósticos (<span id="diag-count">{{ diagnostics|length }}</span>)</button>
                 <button class="btn btn-light" data-section="medicamentos" onclick="showSection('medicamentos')"><i class="fas fa-pills"></i> Medicamentos ({{ medications|length }})</button>
                 <button class="btn btn-light" data-section="alergias" onclick="showSection('alergias')"><i class="fas fa-exclamation-triangle"></i> Alergias ({{ allergies|length }})</button>
-                <button class="btn btn-light" data-section="vacunas" onclick="showSection('vacunas')"><i class="fas fa-syringe"></i> Vacunas ({{ vaccines|length }})</button>
+                
             </div>
         </div>
 
@@ -96,7 +96,7 @@
             </div>
 
             <div id="diagnosticos" class="card-white mb-3 section" style="display:none">
-                <h5>Diagnósticos / Recetas</h5>
+                <h5>Diagnósticos</h5>
                         <div class="d-flex mb-2">
                             <input id="searchMr" class="form-control" placeholder="Buscar por Portafolio médico (ej. 221)" style="width:260px;margin-right:8px" />
                             <button class="btn btn-outline-primary" onclick="searchDiagnostics()">Buscar</button>
@@ -112,7 +112,6 @@
                                         <div style="margin-top:6px;color:#333">Medicamentos: <span style="color:#666">{{ d.treatment }}</span></div>
                                     </div>
                                     <div>
-                                        <a class="btn btn-sm btn-secondary" href="/receta">Ver</a>
                                         <button class="btn btn-sm btn-danger" onclick="deleteDiagnostic('{{ d.id }}', this)">Eliminar</button>
                                     </div>
                                 </div>
@@ -126,18 +125,35 @@
 
             <div id="medicamentos" class="card-white mb-3 section" style="display:none">
                 <h5>Medicamentos</h5>
-                <div class="small-muted p-3">Lista de medicamentos no disponible (no modelado). Puedes agregar registros en el futuro.</div>
+                <div id="medList">
+                    {% if medications and medications|length > 0 %}
+                        <ul class="list-group">
+                            {% for m in medications %}
+                                <li class="list-group-item">{{ m }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="small-muted p-3">No hay medicamentos registrados.</div>
+                    {% endif %}
+                </div>
             </div>
 
             <div id="alergias" class="card-white mb-3 section" style="display:none">
                 <h5>Alergias</h5>
-                <div class="small-muted p-3">No hay alergias registradas.</div>
+                <div id="allergiesList">
+                    {% if allergies and allergies|length > 0 %}
+                        <ul class="list-group">
+                            {% for a in allergies %}
+                                <li class="list-group-item">{{ a }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="small-muted p-3">No hay alergias registradas.</div>
+                    {% endif %}
+                </div>
             </div>
 
-            <div id="vacunas" class="card-white mb-3 section" style="display:none">
-                <h5>Vacunas</h5>
-                <div class="small-muted p-3">No hay vacunas registradas.</div>
-            </div>
+            
         </div>
     </div>
 
@@ -209,7 +225,7 @@
                     `<div><div style="font-weight:bold">${date} - Expediente: ${d.medical_record}</div>`+
                     `<div class="small-muted">${d.description || ''}</div>`+
                     `<div style="margin-top:6px;color:#333">Medicamentos: <span style="color:#666">${d.treatment || ''}</span></div></div>`+
-                    `<div><a class="btn btn-sm btn-secondary" href="/receta">Ver</a> <button class="btn btn-sm btn-danger" onclick="deleteDiagnostic('${d.id}', this)">Eliminar</button></div></div>`;
+                    `<div><button class="btn btn-sm btn-danger" onclick="deleteDiagnostic('${d.id}', this)">Eliminar</button></div></div>`;
             }
             container.innerHTML = html;
             // update diagnostics count badge

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pacientes - Doctor</title>
+    <title>Expedientes - Doctor</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -148,21 +148,6 @@
         gap: 20px;
       }
 
-      .btn-new-consultation {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background-color 0.3s;
-      }
-
-      .btn-new-consultation:hover {
-        background-color: #0056b3;
-      }
-
       /* Table Section */
       .section {
         background-color: white;
@@ -202,18 +187,23 @@
         background-color: #f9f9f9;
       }
 
-      .btn-download {
-        background-color: #f0f0f0;
+      .btn-view {
+        background-color: #007bff;
+        color: white;
         border: none;
         padding: 8px 12px;
         border-radius: 4px;
         cursor: pointer;
-        color: #333;
         transition: background-color 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
       }
 
-      .btn-download:hover {
-        background-color: #e0e0e0;
+      .btn-view:hover {
+        background-color: #0056b3;
+        color: white;
       }
 
       .status-badge {
@@ -226,16 +216,6 @@
       .status-active {
         background-color: #d4edda;
         color: #155724;
-      }
-
-      .status-inactive {
-        background-color: #f8d7da;
-        color: #721c24;
-      }
-
-      .status-pending {
-        background-color: #fff3cd;
-        color: #856404;
       }
 
       .no-patients {
@@ -289,7 +269,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="/doctor/patients" class="nav-link active">
+            <a href="/doctor/patients" class="nav-link">
               <i class="fas fa-users"></i>
               Pacientes
             </a>
@@ -301,7 +281,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="/expedientes" class="nav-link">
+            <a href="/expedientes" class="nav-link active">
               <i class="fas fa-file-medical"></i>
               Expedientes
             </a>
@@ -320,29 +300,19 @@
         <!-- Header -->
         <div class="header">
           <div class="header-left">
-            <h1>Pacientes</h1>
+            <h1>Expedientes</h1>
             <p class="header-subtitle">
               Bienvenido de vuelta, Dr. {{ doctor.name }}
             </p>
           </div>
           <div class="header-right">
             <i class="fas fa-bell" style="font-size: 20px; cursor: pointer"></i>
-            <a
-              href="/doctor/register-patient"
-              class="btn-new-consultation"
-              style="
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-              "
-              >+ Registrar Paciente</a
-            >
           </div>
         </div>
 
-        <!-- Patients Section -->
+        <!-- Expedientes Section -->
         <div class="section">
-          <h2 class="section-title">Pacientes Registrados</h2>
+          <h2 class="section-title">Todos los Expedientes</h2>
 
           {% if patients %}
           <div class="table-responsive">
@@ -351,10 +321,10 @@
                 <tr>
                   <th>ID Expediente</th>
                   <th>Paciente</th>
-                  <th>Fecha</th>
+                  <th>DUI</th>
                   <th>Tipo de sangre</th>
-                  <th>Médico</th>
-                  <th>Estado</th>
+                  <th>Teléfono</th>
+                  <th>Consultas</th>
                   <th>Acción</th>
                 </tr>
               </thead>
@@ -366,21 +336,14 @@
                 >
                   <td>{{ patient.file_number }}</td>
                   <td>{{ patient.name }} {{ patient.surname }}</td>
-                  <td>
-                    {% if patient.birth_date %} {% if patient.birth_date is
-                    string %} {{ patient.birth_date }} {% else %} {{
-                    patient.birth_date.strftime('%d/%m/%Y') }} {% endif %} {%
-                    else %} N/A {% endif %}
-                  </td>
+                  <td>{{ patient.dui }}</td>
                   <td>{{ patient.blood_type }}</td>
-                  <td>{{ doctor.name }} {{ doctor.surname }}</td>
-                  <td>
-                    <span class="status-badge status-active">Activo</span>
-                  </td>
+                  <td>{{ patient.phone }}</td>
+                  <td>{{ patient.consultations_count }}</td>
                   <td onclick="event.stopPropagation();">
-                    <button class="btn-download" title="Descargar">
-                      <i class="fas fa-download"></i>
-                    </button>
+                    <a href="/expedientes/{{ patient.id }}" class="btn-view">
+                      <i class="fas fa-eye"></i> Ver
+                    </a>
                   </td>
                 </tr>
                 {% endfor %}
@@ -389,8 +352,8 @@
           </div>
           {% else %}
           <div class="no-patients">
-            <i class="fas fa-users"></i>
-            <p>No hay pacientes registrados aún</p>
+            <i class="fas fa-file-medical"></i>
+            <p>No hay expedientes registrados aún</p>
           </div>
           {% endif %}
         </div>
