@@ -299,7 +299,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="/files" class="nav-link">
+          <a href="/doctor/patients" class="nav-link active">
             <i class="fas fa-file-medical"></i>
             Expedientes
           </a>
@@ -347,7 +347,7 @@
                 <th>ID Expediente</th>
                 <th>Paciente</th>
                 <th>Fecha</th>
-                <th>Especialidad</th>
+                <th>Tipo de sangre</th>
                 <th>Médico</th>
                 <th>Estado</th>
                 <th>Acción</th>
@@ -355,22 +355,26 @@
             </thead>
             <tbody>
               {% for patient in patients %}
-              <tr>
+              <tr onclick="window.location.href='/expedientes/{{ patient.id }}'" style="cursor: pointer;">
                 <td>{{ patient.file_number }}</td>
                 <td>{{ patient.name }} {{ patient.surname }}</td>
                 <td>
                   {% if patient.birth_date %}
-                    {{ patient.birth_date.strftime('%d/%m/%Y') if patient.birth_date is not string else patient.birth_date }}
+                    {% if patient.birth_date is string %}
+                      {{ patient.birth_date }}
+                    {% else %}
+                      {{ patient.birth_date.strftime('%d/%m/%Y') }}
+                    {% endif %}
                   {% else %}
                     N/A
                   {% endif %}
                 </td>
-                <td>{{ patient.get('blood_type', 'N/A') }}</td>
+                <td>{{ patient.blood_type }}</td>
                 <td>{{ doctor.name }} {{ doctor.surname }}</td>
                 <td>
                   <span class="status-badge status-active">Activo</span>
                 </td>
-                <td>
+                <td onclick="event.stopPropagation();">
                   <button class="btn-download" title="Descargar">
                     <i class="fas fa-download"></i>
                   </button>
@@ -389,8 +393,6 @@
       </div>
     </div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

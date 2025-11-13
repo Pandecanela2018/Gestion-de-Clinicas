@@ -399,7 +399,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="/files" class="nav-link">
+          <a href="/doctor/patients" class="nav-link">
             <i class="fas fa-file-medical"></i>
             Expedientes
           </a>
@@ -435,7 +435,7 @@
             <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #999;">✕</span>
           </div>
           <i class="fas fa-bell notification-icon"></i>
-          <button class="btn-new-consultation">+ Nueva Consulta</button>
+          <button id="btnPending" class="btn-new-consultation">+ Nueva Consulta</button>
         </div>
       </div>
 
@@ -520,6 +520,95 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</script>
+  <!-- Pending appointments modal -->
+  <div class="modal fade" id="pendingModal" tabindex="-1" aria-labelledby="pendingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pendingModalLabel">Consultas Pendientes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="pendingList">
+            <p class="text-muted">Cargando...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    const btnPending = document.getElementById('btnPending');
+    const pendingModalEl = document.getElementById('pendingModal');
+    const pendingList = document.getElementById('pendingList');
+    const pendingModal = new bootstrap.Modal(pendingModalEl);
+
+    async function loadPending() {
+      pendingList.innerHTML = '<p class="text-muted">Cargando...</p>';
+      try {
+        const res = await fetch('/doctor/appointments/pending');
+        if (!res.ok) throw new Error('Error fetching');
+        const data = await res.json();
+        if (!data || data.length === 0) {
+          pendingList.innerHTML = '<p class="text-muted">No hay consultas pendientes.</p>';
+          return;
+        }
+
+        const html = data.map(a => {
+          return `
+            <div class="d-flex align-items-start mb-3 p-2 border rounded">
+              <div style="flex:1">
+                <strong>${a.patient_name || 'Paciente'}</strong>
+                <div class="text-muted small">${a.date || ''} ${a.time || ''}</div>
+                <div class="mt-1">${a.reason || ''}</div>
+              </div>
+              <div class="ms-3">
+                <button class="btn btn-sm btn-success me-1" data-id="${a.id}" data-action="confirm">Confirmar</button>
+                <button class="btn btn-sm btn-danger" data-id="${a.id}" data-action="cancel">Cancelar</button>
+              </div>
+            </div>
+          `
+        }).join('');
+
+        pendingList.innerHTML = html;
+
+        // attach handlers
+        pendingList.querySelectorAll('button[data-action]').forEach(btn => {
+          btn.addEventListener('click', async (ev) => {
+            const id = btn.getAttribute('data-id');
+            const action = btn.getAttribute('data-action');
+            btn.disabled = true;
+            try {
+              const resp = await fetch(`/doctor/appointments/${id}/${action}`, { method: 'POST' });
+              if (resp.ok) {
+                // reload the list
+                await loadPending();
+              } else {
+                alert('Error al actualizar la consulta');
+              }
+            } catch (e) {
+              console.error(e);
+              alert('Error de red');
+            } finally {
+              btn.disabled = false;
+            }
+          });
+        });
+
+      } catch (e) {
+        console.error(e);
+        pendingList.innerHTML = '<p class="text-danger">No se pudieron cargar las consultas.</p>';
+      }
+    }
+
+    btnPending.addEventListener('click', (ev) => {
+      loadPending();
+      pendingModal.show();
+    });
+  </script>
 </body>
 </html>
