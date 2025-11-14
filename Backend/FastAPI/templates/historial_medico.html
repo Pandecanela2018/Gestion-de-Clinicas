@@ -11,7 +11,7 @@
         body{ font-family:Arial,Helvetica,sans-serif; background:#f5f7fb }
         .sidebar{ background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%); min-height:100vh; width:220px; position:fixed; left:0; top:0; padding-top:20px }
         .logo{text-align:center;margin-bottom:40px}
-        .logo img{width:80px;height:80px}
+        .logo img{width:80px;height:80px;filter:brightness(0) invert(1)}
         .sidebar .nav-item{margin:15px 0;border-left:4px solid transparent}
         .sidebar .nav-item.active, .sidebar .nav-item:hover{border-left-color:#3498db;background-color:rgba(52,152,219,0.08)}
         .sidebar .nav-link{color:#ecf0f1;padding:12px 20px;display:flex;align-items:center;gap:15px;text-decoration:none}
@@ -25,7 +25,7 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo"><img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo"></div>
+        <div class="logo"><img src="{{ url_for('static', path='/img/logosv.png') }}" alt="Logo"></div>
         <nav>
             <div class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-home"></i><span>Inicio</span></a></div>
             <div class="nav-item"><a class="nav-link" href="/calendario"><i class="fas fa-calendar-alt"></i><span>Calendario</span></a></div>

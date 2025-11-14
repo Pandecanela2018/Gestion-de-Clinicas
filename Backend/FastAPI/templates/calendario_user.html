@@ -38,6 +38,7 @@
       .logo img {
         width: 80px;
         height: 80px;
+        filter: brightness(0) invert(1);
       }
       .sidebar .nav-item {
         margin: 15px 0;
@@ -83,20 +84,7 @@
         margin: 0;
         font-size: 28px;
       }
-      .search-bar {
-        background: white;
-        padding: 8px 15px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 300px;
-      }
-      .search-bar input {
-        border: none;
-        outline: none;
-        width: 100%;
-      }
+
       .calendar-container {
         background: white;
         border-radius: 8px;
@@ -219,6 +207,18 @@
       .calendar-table .today {
         background: #e9f2ff;
       }
+      .calendar-table .selected {
+        background: #d4e4ff;
+        border: 2px solid #667eea;
+        font-weight: bold;
+      }
+      .calendar-table td {
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .calendar-table td:not(.other-month):hover {
+        background: #f0f0f0;
+      }
       .appointment-dots {
         display: flex;
         gap: 6px;
@@ -275,7 +275,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
-        <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo" />
+        <img src="{{ url_for('static', path='/img/logosv.png') }}" alt="Logo" />
       </div>
       <nav>
         <div class="nav-item">
@@ -306,10 +306,6 @@
     <div class="main-content">
       <div class="header">
         <h2>Calendario de Citas Médicas</h2>
-        <div class="search-bar">
-          <i class="fas fa-search"></i
-          ><input id="searchInput" placeholder="Buscar..." />
-        </div>
       </div>
 
       <div class="calendar-container">
@@ -389,7 +385,7 @@
           </tbody>
         </table>
         <div class="appointments-section">
-          <h4><i class="fas fa-list"></i> Citas Programadas para Hoy</h4>
+          <h4><i class="fas fa-list"></i> <span id="selectedDateTitle">Citas Programadas para Hoy</span></h4>
           <div id="appointmentsList">
             <div class="no-appointments">
               <i class="fas fa-inbox"></i>
@@ -409,21 +405,33 @@
 
       async function loadSchedules() {
         try {
+          // Volvemos a /appointments/ (citas del paciente) y derivamos hora desde 'date'.
           const response = await fetch("/appointments/");
-          if (response.ok) {
-            const data = await response.json();
-            allSchedules = data;
-            filteredSchedules = data;
-            renderCalendar();
-            updateStats();
-            // Mantener la fecha seleccionada en lugar de cambiarla
-            if (selectedDate) {
-              displayAppointments(selectedDate);
-            } else {
-              displayAppointments(new Date());
-            }
-          } else {
+          if (!response.ok) {
             console.error("Error al cargar las citas");
+            return;
+          }
+          const data = await response.json();
+          // Normalizar estructura agregando hour_start/hour_end desde date si existen.
+          const normalized = data.map((a) => {
+            let dateObj;
+            try { dateObj = new Date(a.date); } catch (_) {}
+            const timeStr = dateObj && !isNaN(dateObj) ? dateObj.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }) : "";
+            return {
+              ...a,
+              hour_start: a.hour_start || timeStr || "",
+              hour_end: a.hour_end || "",
+              day: a.day || (dateObj && !isNaN(dateObj) ? dateObj.toISOString().split("T")[0] : "")
+            };
+          });
+          allSchedules = normalized;
+          filteredSchedules = normalized;
+          renderCalendar();
+          updateStats();
+          if (selectedDate) {
+            displayAppointments(selectedDate);
+          } else {
+            displayAppointments(new Date());
           }
         } catch (error) {
           console.error("Error:", error);
@@ -514,7 +522,57 @@
       function selectDate(date) {
         selectedDate = date;
         displayAppointments(date);
+        // Actualizar el título con la fecha seleccionada
+        updateDateTitle(date);
+        // Actualizar visualmente el día seleccionado
+        highlightSelectedDay(date);
       }
+      
+      function highlightSelectedDay(date) {
+        // Remover la clase 'selected' de todas las celdas
+        document.querySelectorAll('.calendar-table td').forEach(cell => {
+          cell.classList.remove('selected');
+        });
+        
+        // Agregar la clase 'selected' al día clickeado
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const day = date.getDate();
+        const dateMonth = date.getMonth();
+        const dateYear = date.getFullYear();
+        
+        // Solo resaltar si la fecha está en el mes actual mostrado
+        if (dateMonth === month && dateYear === year) {
+          const cells = document.querySelectorAll('.calendar-table td:not(.other-month)');
+          cells.forEach(cell => {
+            const cellText = cell.querySelector('.date-number');
+            if (cellText && parseInt(cellText.textContent) === day) {
+              cell.classList.add('selected');
+            }
+          });
+        }
+      }
+      
+      function updateDateTitle(date) {
+        const today = new Date();
+        const dateStr = date.toLocaleDateString("es-ES", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        
+        // Capitalizar primera letra
+        const capitalizedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        
+        const titleElement = document.getElementById("selectedDateTitle");
+        if (date.toDateString() === today.toDateString()) {
+          titleElement.textContent = "Citas Programadas para Hoy";
+        } else {
+          titleElement.textContent = `Citas Programadas para ${capitalizedDate}`;
+        }
+      }
+      
       function displayAppointments(date) {
         const dateStr = date.toISOString().split("T")[0];
         const appointmentsForDate = filteredSchedules.filter(
@@ -525,39 +583,29 @@
           appointmentsList.innerHTML = `<div class="no-appointments"><i class="fas fa-inbox"></i><p>No hay citas para esta fecha</p></div>`;
         } else {
           appointmentsList.innerHTML = appointmentsForDate
-            .map(
-              (appointment) => `
-                    <div class="appointment-item">
-                        <div class="appointment-info">
-                            <div class="appointment-time"><i class="fas fa-clock"></i> ${
-                              appointment.hour_start || "---"
-                            } - ${appointment.hour_end || "---"}</div>
-                            <div class="appointment-doctor">Dr. ${
-                              appointment.doctor_name
-                            }</div>
-                            <div class="appointment-day">${new Date(
-                              appointment.day
-                            ).toLocaleDateString("es-ES", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}</div>
-                        </div>
-                        <span class="appointment-status ${getStatusClass(
-                          appointment.status
-                        )}">${
-                normalizeStatus(appointment.status) === "completed"
-                  ? "Completada"
-                  : normalizeStatus(appointment.status) === "confirmed"
-                  ? "Confirmada"
-                  : normalizeStatus(appointment.status) === "cancelled"
-                  ? "Cancelada"
-                  : "Programada"
-              }</span>
-                    </div>
-                `
-            )
+            .map((appointment) => {
+              const soloHora = !appointment.hour_end || appointment.hour_end.trim() === "" || appointment.hour_end === appointment.hour_start;
+              const horaMostrar = soloHora
+                ? (appointment.hour_start || "---")
+                : `${appointment.hour_start} - ${appointment.hour_end}`;
+              return `
+              <div class="appointment-item">
+                  <div class="appointment-info">
+                      <div class="appointment-time"><i class="fas fa-clock"></i> ${horaMostrar}</div>
+                      <div class="appointment-doctor">Dr. ${appointment.doctor_name}</div>
+                      <div class="appointment-day">${new Date(appointment.day).toLocaleDateString("es-ES", {weekday: "long", year: "numeric", month: "long", day: "numeric"})}</div>
+                  </div>
+                  <span class="appointment-status ${getStatusClass(appointment.status)}">${
+                    normalizeStatus(appointment.status) === "completed"
+                      ? "Completada"
+                      : normalizeStatus(appointment.status) === "confirmed"
+                      ? "Confirmada"
+                      : normalizeStatus(appointment.status) === "cancelled"
+                      ? "Cancelada"
+                      : "Programada"
+                  }</span>
+              </div>`;
+            })
             .join("");
         }
       }
@@ -644,17 +692,6 @@
           displayAppointments(selectedDate);
         }
       }
-
-      document.getElementById("searchInput").addEventListener("input", (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredSchedules = allSchedules.filter(
-          (schedule) =>
-            (schedule.doctor_name || "").toLowerCase().includes(searchTerm) ||
-            (schedule.day || "").includes(searchTerm)
-        );
-        renderCalendar();
-        displayAppointments(selectedDate);
-      });
 
       // Cargar citas inicialmente
       loadSchedules();

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 720">
+  <!-- Stars -->
+  <path fill="#2C3E50" d="M335,80 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M415,65 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M490,105 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M545,155 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M565,235 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M545,315 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M490,365 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M415,405 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M335,390 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M263,125 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M215,195 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M195,275 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M215,355 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  <path fill="#2C3E50" d="M263,345 l8,-25 l8,25 l26,0 l-21,16 l8,25 l-21,-16 l-21,16 l8,-25 l-21,-16z"/>
+  
+  <!-- Coat of arms -->
+  <g transform="translate(250, 150)">
+    <!-- Triangle/pyramid -->
+    <path fill="none" stroke="#2C3E50" stroke-width="6" d="M130,10 L230,150 L30,150 Z"/>
+    <!-- Eye symbol -->
+    <circle cx="130" cy="80" r="20" fill="none" stroke="#2C3E50" stroke-width="3"/>
+    <circle cx="130" cy="80" r="8" fill="#2C3E50"/>
+    <!-- Rays -->
+    <line x1="130" y1="60" x2="130" y2="45" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="145" y1="67" x2="155" y2="57" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="150" y1="80" x2="165" y2="80" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="145" y1="93" x2="155" y2="103" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="130" y1="100" x2="130" y2="115" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="115" y1="93" x2="105" y2="103" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="110" y1="80" x2="95" y2="80" stroke="#2C3E50" stroke-width="2"/>
+    <line x1="115" y1="67" x2="105" y2="57" stroke="#2C3E50" stroke-width="2"/>
+    
+    <!-- Laurel wreaths -->
+    <path fill="#2C3E50" d="M70,100 Q50,120 60,145 Q65,130 75,125 Q70,135 75,150 Q80,135 85,130 Q80,140 85,155 Q90,140 95,135"/>
+    <path fill="#2C3E50" d="M190,100 Q210,120 200,145 Q195,130 185,125 Q190,135 185,150 Q180,135 175,130 Q180,140 175,155 Q170,140 165,135"/>
+    
+    <!-- Flags -->
+    <rect x="40" y="130" width="25" height="40" fill="#2C3E50"/>
+    <rect x="195" y="130" width="25" height="40" fill="#2C3E50"/>
+    
+    <!-- Base scroll -->
+    <path fill="none" stroke="#2C3E50" stroke-width="4" d="M50,165 Q130,175 210,165"/>
+    <text x="130" y="185" font-family="serif" font-size="12" fill="#2C3E50" text-anchor="middle">DIOS UNION LIBERTAD</text>
+  </g>
+  
+  <!-- Text -->
+  <text x="380" y="580" font-family="serif" font-size="72" font-weight="300" fill="#2C3E50" text-anchor="middle">GOBIERNO DE</text>
+  <text x="380" y="680" font-family="serif" font-size="86" font-weight="300" fill="#2C3E50" text-anchor="middle">EL SALVADOR</text>
+</svg>

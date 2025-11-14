@@ -5,7 +5,7 @@ from db.client import db_client
 from db.schemas.Doctor import doctor_schema
 from utils.session import get_session
 from bson import ObjectId
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter()
@@ -31,15 +31,20 @@ async def dashboard_doctor(request: Request):
         start_of_day = datetime.combine(today, datetime.min.time())
         end_of_day = datetime.combine(today, datetime.max.time())
         
-        total_patients = db_client.Prueba.Appointment.count_documents({"doctor_name": doctor_full_name})
+        # Total de pacientes registrados en el sistema
+        total_patients = db_client.Prueba.Patient.count_documents({})
         
+        # Citas de hoy
         today_appointments = db_client.Prueba.Appointment.count_documents({
             "doctor_name": doctor_full_name,
             "date": {"$gte": start_of_day, "$lte": end_of_day}
         })
         
-        active_consultations = db_client.Prueba.Consultation.count_documents({"doctor_name": doctor_full_name})
-        new_files = db_client.Prueba.File.count_documents({"doctor_name": doctor_full_name})
+        # Consultas activas: citas confirmadas del doctor
+        active_consultations = db_client.Prueba.Appointment.count_documents({
+            "doctor_name": doctor_full_name,
+            "status": "confirmed"
+        })
         
         recent_patients = list(db_client.Prueba.Patient.find().limit(5))
         
@@ -54,7 +59,6 @@ async def dashboard_doctor(request: Request):
             "total_patients": total_patients,
             "today_appointments": today_appointments,
             "active_consultations": active_consultations,
-            "new_files": new_files,
             "recent_patients": recent_patients,
             "appointments_today": appointments_today
         })

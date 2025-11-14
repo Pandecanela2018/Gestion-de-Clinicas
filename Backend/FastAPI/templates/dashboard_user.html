@@ -42,7 +42,7 @@
       .logo img {
         width: 80px;
         height: 80px;
-        
+        filter: brightness(0) invert(1);
       }
 
       .sidebar .nav-item {
@@ -97,21 +97,7 @@
         font-size: 28px;
       }
 
-      .search-bar {
-        background: white;
-        padding: 8px 15px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 300px;
-      }
 
-      .search-bar input {
-        border: none;
-        outline: none;
-        width: 100%;
-      }
 
       .stats-container {
         display: grid;
@@ -333,7 +319,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
-        <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Logo" />
+        <img src="{{ url_for('static', path='/img/logosv.png') }}" alt="Logo" />
       </div>
 
       <nav>
@@ -374,10 +360,6 @@
       <!-- Header -->
       <div class="header">
         <h2>Hola, {{ patient.name }}</h2>
-        <div class="search-bar">
-          <i class="fas fa-search" style="color: #999"></i>
-          <input type="text" placeholder="Buscar..." />
-        </div>
       </div>
 
       <!-- Content Row: Info and Appointments -->

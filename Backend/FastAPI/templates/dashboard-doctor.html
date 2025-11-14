@@ -153,11 +153,7 @@
       width: 200px;
     }
 
-    .notification-icon {
-      font-size: 20px;
-      color: #333;
-      cursor: pointer;
-    }
+
 
     .btn-new-consultation {
       background-color: #007bff;
@@ -370,7 +366,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
-        <img src="{{ url_for('static', path='/img/logosv.jpg') }}" alt="Gobierno" />
+        <img src="{{ url_for('static', path='/img/logosv.png') }}" alt="Gobierno" />
       </div>
 
       <ul class="nav-menu">
@@ -418,11 +414,6 @@
           <p class="header-subtitle">Bienvenido de vuelta, Dr. {{ doctor.name }}</p>
         </div>
         <div class="header-right">
-          <div class="search-box">
-            <input type="text" placeholder="Nombre" />
-            <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #999;">✕</span>
-          </div>
-          <i class="fas fa-bell notification-icon"></i>
           <button id="btnPending" class="btn-new-consultation">+ Nueva Consulta</button>
         </div>
       </div>
@@ -456,16 +447,6 @@
           </div>
           <div class="stat-icon">
             <i class="fas fa-stethoscope"></i>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-content">
-            <h3>Expedientes Nuevos</h3>
-            <p class="stat-number">{{ new_files }}</p>
-          </div>
-          <div class="stat-icon">
-            <i class="fas fa-folder-plus"></i>
           </div>
         </div>
       </div>

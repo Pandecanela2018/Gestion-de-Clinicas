@@ -291,7 +291,7 @@
       <div class="sidebar">
         <div class="logo">
           <img
-            src="{{ url_for('static', path='/img/logosv.jpg') }}"
+            src="{{ url_for('static', path='/img/logosv.png') }}"
             alt="Gobierno"
           />
         </div>
@@ -310,12 +310,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="/appointments" class="nav-link">
-              <i class="fas fa-calendar-alt"></i>
-              Citas Médicas
-            </a>
-          </li>
-          <li class="nav-item">
             <a href="/consultations" class="nav-link">
               <i class="fas fa-stethoscope"></i>
               Consultas
@@ -325,12 +319,6 @@
             <a href="/expedientes" class="nav-link">
               <i class="fas fa-file-medical"></i>
               Expedientes
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="/reports" class="nav-link">
-              <i class="fas fa-file-alt"></i>
-              Reportes
             </a>
           </li>
         </ul>
@@ -422,7 +410,7 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="dui">Tipo de DUI *</label>
+                  <label for="dui">DUI *</label>
                   <input
                     type="text"
                     id="dui"
@@ -436,7 +424,7 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label for="file_number">Número de Identificación *</label>
+                  <label for="file_number">Número de Expediente *</label>
                   <input
                     type="number"
                     id="file_number"
