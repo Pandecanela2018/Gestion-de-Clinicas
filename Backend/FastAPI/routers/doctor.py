@@ -40,11 +40,12 @@ async def doctor(doctor: DoctorP):
 
     return Doctor(**new_doctor)
 
-@router.put("/", response_model=Doctor)
-async def doctor(doctor: DoctorP):
+@router.put("/{id}", response_model=Doctor)
+async def doctor(id: str, doctor: DoctorP):
 
     doctor_dict = dict(doctor)
-    del doctor_dict["id"]
+    if "id" in doctor_dict:
+        del doctor_dict["id"]
 
     if doctor.password:
         doctor_dict["password"] = hash_password(doctor.password)
@@ -52,11 +53,11 @@ async def doctor(doctor: DoctorP):
         del doctor_dict["password"]
 
     try:
-        db_client.Prueba.Doctor.find_one_and_replace({"_id": ObjectId(doctor.id)}, doctor_dict)
+        db_client.Prueba.Doctor.find_one_and_replace({"_id": ObjectId(id)}, doctor_dict)
     except:
         return {"error": "No se a actualizado el usuario"}
     
-    return search_doctor("_id", ObjectId(doctor.id))
+    return search_doctor("_id", ObjectId(id))
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

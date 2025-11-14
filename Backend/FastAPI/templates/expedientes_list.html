@@ -111,6 +111,37 @@
       .doctor-specialty {
         color: #666;
         font-size: 12px;
+        margin-bottom: 15px;
+      }
+
+      .btn-logout {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        transition: background-color 0.3s;
+      }
+
+      .btn-logout:hover {
+        background-color: #c82333;
+        color: white;
+      }
+
+      .btn-logout i {
+        margin-right: 8px;
+      }
+
+      .doctor-specialty {
+        color: #666;
+        font-size: 12px;
       }
 
       /* Main Content */
@@ -292,6 +323,9 @@
           <div class="doctor-avatar">{{ doctor.name[0].upper() }}</div>
           <p class="doctor-name">{{ doctor.name }} {{ doctor.surname }}</p>
           <p class="doctor-specialty">{{ doctor.speciality }}</p>
+          <a href="/logout-doctor" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>Cerrar Sesión
+          </a>
         </div>
       </div>
 
